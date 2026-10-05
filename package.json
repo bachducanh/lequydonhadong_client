@@ -1,0 +1,21 @@
+{
+  "name": "lequydon-hadong",
+  "private": true,
+  "description": "Website Trường THPT Lê Quý Đôn – Hà Đông: API (NestJS) + Web (Next.js)",
+  "scripts": {
+    "setup": "npm install && npm --prefix apps/api install && npm --prefix apps/web install",
+    "db:up": "docker compose up -d postgres redis",
+    "db:down": "docker compose down",
+    "db:migrate": "npm --prefix apps/api run prisma:migrate",
+    "db:seed": "npm --prefix apps/api run prisma:seed",
+    "dev:api": "npm --prefix apps/api run start:dev",
+    "dev:web": "npm --prefix apps/web run dev",
+    "dev": "concurrently -k -n api,web -c blue,green \"npm:dev:api\" \"npm:dev:web\"",
+    "build": "npm --prefix apps/api run build && npm --prefix apps/web run build",
+    "docker:up": "docker compose --profile app up -d --build",
+    "docker:down": "docker compose --profile app down"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.0"
+  }
+}

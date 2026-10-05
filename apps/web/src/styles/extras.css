@@ -1,0 +1,146 @@
+/* Bổ sung ngoài bản thiết kế: nội dung bài viết, menu di động, hộp thoại quản trị, thông báo nổi. */
+
+/* Nội dung HTML từ trình soạn thảo */
+.lqd-prose { font-size: 17px; line-height: 30px; color: var(--ink); overflow-wrap: anywhere; }
+.lqd-prose > * + * { margin-top: var(--space-4); }
+.lqd-prose h2 { font-size: 24px; line-height: 32px; font-weight: 700; margin-top: var(--space-8); }
+.lqd-prose h3 { font-size: 20px; line-height: 28px; font-weight: 700; margin-top: var(--space-6); }
+.lqd-prose a { color: var(--link); text-decoration: underline; text-underline-offset: 3px; }
+.lqd-prose ul { list-style: disc; padding-left: 1.4em; }
+.lqd-prose ol { list-style: decimal; padding-left: 1.4em; }
+.lqd-prose li + li { margin-top: var(--space-1); }
+.lqd-prose img { border-radius: var(--radius-lg); margin-left: auto; margin-right: auto; height: auto; }
+.lqd-prose blockquote { border-left: 3px solid var(--accent); padding: var(--space-2) var(--space-4); background: var(--surface-sunken); border-radius: 0 var(--radius-md) var(--radius-md) 0; }
+.lqd-prose table { width: 100%; border-collapse: collapse; font-size: 15px; }
+.lqd-prose th, .lqd-prose td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; }
+.lqd-prose iframe { width: 100%; aspect-ratio: 16 / 9; height: auto; border-radius: var(--radius-lg); }
+.lqd-prose figcaption { font-size: 14px; color: var(--ink-muted); text-align: center; }
+
+/* Chip lọc và phân trang dạng link (trang công khai, không cần JS) */
+.lqd-tabs a { font-size: 14px; font-weight: 600; color: var(--ink-muted); background: var(--surface-raised); border: 1.5px solid var(--border); border-radius: var(--radius-pill); padding: 7px 16px; display: inline-flex; gap: var(--space-2); align-items: center; text-decoration: none; }
+.lqd-tabs a:hover { border-color: var(--border-strong); color: var(--ink); }
+.lqd-tabs a[aria-current="page"] { background: var(--primary); border-color: var(--primary); color: var(--on-primary); }
+.lqd-tabs a[aria-current="page"] .lqd-tabs-count { background: var(--on-primary); color: var(--primary); }
+.lqd-pager a { min-width: 36px; height: 36px; padding: 0 8px; border-radius: var(--radius-pill); color: var(--ink); font-size: 14px; font-weight: 600; display: grid; place-items: center; text-decoration: none; }
+.lqd-pager a:hover { background: var(--accent-soft); }
+.lqd-pager a[aria-current="page"] { background: var(--primary); color: var(--on-primary); }
+.lqd-search-compact { padding-right: var(--space-4); }
+
+/* Trạng thái trống, thông báo biểu mẫu */
+.lqd-empty { display: flex; flex-direction: column; align-items: center; gap: var(--space-2); text-align: center; padding: var(--space-12) var(--space-4); border: 1px dashed var(--border-strong); border-radius: var(--radius-lg); color: var(--ink-muted); background: var(--surface-raised); }
+.lqd-empty .lqd-icon { width: 32px; height: 32px; color: var(--primary-text); }
+.lqd-empty b { color: var(--ink); font-size: 16px; }
+.lqd-alert { display: flex; gap: var(--space-2); align-items: flex-start; padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); font-size: 14px; line-height: 22px; }
+.lqd-alert .lqd-icon { width: 18px; height: 18px; margin-top: 2px; }
+.lqd-alert-success { background: var(--success-soft); color: var(--success); }
+.lqd-alert-error { background: var(--danger-soft); color: var(--danger); }
+
+/* Menu di động */
+.lqd-nav-toggle { display: none; }
+.lqd-mobile-menu { display: none; }
+@media (max-width: 860px) {
+  .lqd-nav-toggle { display: inline-grid; }
+  .lqd-nav .lqd-container { gap: var(--space-3); }
+  .lqd-nav-actions { margin-left: auto; }
+  .lqd-nav .lqd-logo-text b { font-size: 15px; }
+  .lqd-nav-cta { display: none; }
+  .lqd-mobile-menu.is-open { display: flex; flex-direction: column; padding: var(--space-2) var(--space-4) var(--space-4); background: var(--surface-raised); border-bottom: 1px solid var(--border); box-shadow: var(--shadow-card); position: relative; z-index: 2; }
+  .lqd-mobile-menu a { padding: 12px 0; color: var(--ink); text-decoration: none; font-weight: 500; border-bottom: 1px solid var(--border); }
+  .lqd-mobile-menu a[aria-current="page"] { color: var(--primary-text); font-weight: 700; }
+  .lqd-mobile-menu .lqd-btn { margin-top: var(--space-3); }
+  .lqd-pagehead h1 { font-size: 32px; line-height: 40px; }
+  .lqd-sechead { flex-direction: column; align-items: flex-start; }
+  .lqd-sechead h2 { font-size: 26px; line-height: 34px; }
+  .lqd-doc { flex-wrap: wrap; }
+  .lqd-doc-main { min-width: 60%; }
+  .lqd-searchpanel { padding: var(--space-6); }
+  .lqd-slider-inner { padding-bottom: 140px; }
+  .lqd-promo-text { padding: var(--space-8) var(--space-6); }
+  .lqd-aside { position: static; }
+  .lqd-article h1 { font-size: 30px !important; line-height: 38px !important; }
+}
+
+/* Ảnh album + xem ảnh lớn */
+.lqd-photos { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: var(--space-4); }
+.lqd-photo { display: block; padding: 0; border: 0; background: var(--accent-soft); border-radius: var(--radius-md); overflow: hidden; aspect-ratio: 4 / 3; cursor: zoom-in; }
+.lqd-photo img { width: 100%; height: 100%; object-fit: cover; transition: transform .2s; }
+.lqd-photo:hover img { transform: scale(1.03); }
+.lqd-lightbox { position: fixed; inset: 0; z-index: 60; background: rgba(5, 15, 31, .92); display: grid; grid-template-rows: auto 1fr auto; color: #fff; }
+.lqd-lightbox-top { display: flex; justify-content: space-between; align-items: center; padding: var(--space-3) var(--space-4); font-size: 14px; }
+.lqd-lightbox-stage { display: flex; align-items: center; justify-content: center; gap: var(--space-4); padding: 0 var(--space-4); min-height: 0; }
+.lqd-lightbox-stage img { max-width: min(1100px, 100%); max-height: 100%; object-fit: contain; border-radius: var(--radius-md); }
+.lqd-lightbox button { color: #fff; background: rgba(255, 255, 255, .12); border: 0; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; cursor: pointer; flex: none; }
+.lqd-lightbox button:hover { background: rgba(255, 255, 255, .25); }
+.lqd-lightbox-caption { text-align: center; padding: var(--space-3) var(--space-4) var(--space-6); font-size: 14px; color: #BBDEFB; }
+
+/* Hộp thoại (quản trị) */
+.lqd-modal-backdrop { position: fixed; inset: 0; z-index: 50; background: rgba(7, 19, 34, .55); display: flex; justify-content: flex-end; }
+.lqd-modal-backdrop.is-center { justify-content: center; align-items: center; padding: var(--space-4); }
+.lqd-drawer { width: min(560px, 100%); height: 100%; background: var(--surface-raised); box-shadow: var(--shadow-search); display: flex; flex-direction: column; animation: lqd-slide-in .18s ease both; }
+.lqd-dialog { width: min(440px, 100%); background: var(--surface-raised); border-radius: var(--radius-lg); box-shadow: var(--shadow-search); padding: var(--space-6); display: flex; flex-direction: column; gap: var(--space-4); animation: lqd-fade .15s ease both; }
+.lqd-dialog h3 { margin: 0; font-size: 18px; line-height: 26px; }
+.lqd-dialog p { margin: 0; color: var(--ink-muted); font-size: 15px; line-height: 24px; }
+.lqd-drawer-head { display: flex; justify-content: space-between; align-items: center; gap: var(--space-4); padding: var(--space-4) var(--space-6); border-bottom: 1px solid var(--border); }
+.lqd-drawer-head h2 { margin: 0; font-size: 18px; line-height: 26px; font-weight: 700; }
+.lqd-drawer-body { flex: 1; overflow-y: auto; padding: var(--space-6); display: flex; flex-direction: column; gap: var(--space-4); }
+.lqd-drawer-foot { display: flex; justify-content: flex-end; gap: var(--space-2); padding: var(--space-4) var(--space-6); border-top: 1px solid var(--border); background: var(--surface-sunken); }
+@keyframes lqd-slide-in { from { transform: translateX(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .lqd-drawer, .lqd-dialog { animation: none; } }
+
+.lqd-toasts { position: fixed; right: var(--space-4); bottom: var(--space-4); z-index: 70; display: flex; flex-direction: column; gap: var(--space-2); }
+.lqd-toast { display: flex; align-items: center; gap: var(--space-2); min-width: 260px; max-width: 420px; padding: 12px 16px; border-radius: var(--radius-md); background: var(--surface-inverse); color: var(--on-inverse); box-shadow: var(--shadow-search); font-size: 14px; animation: lqd-fade .15s ease both; }
+.lqd-toast .lqd-icon { width: 18px; height: 18px; }
+.lqd-toast.is-error { background: var(--danger); color: #fff; }
+
+/* Ô tải tệp trong biểu mẫu quản trị */
+.lqd-filefield { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3); border: 1.5px dashed var(--border-strong); border-radius: var(--radius-md); background: var(--surface-sunken); }
+.lqd-filefield-preview { width: 72px; height: 48px; border-radius: var(--radius-sm); flex: none; object-fit: cover; background: var(--accent-soft); }
+.lqd-filefield-name { flex: 1; min-width: 0; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lqd-filefield-name small { display: block; color: var(--ink-muted); font-size: 12px; }
+
+/* Trình soạn thảo */
+.lqd-rte-bar button { width: 32px; height: 32px; border: 0; border-radius: var(--radius-sm); background: transparent; color: var(--ink-muted); font: inherit; font-size: 15px; cursor: pointer; display: inline-grid; place-items: center; }
+.lqd-rte-bar button:hover { background: var(--accent-soft); color: var(--primary-text); }
+.lqd-rte-bar button .lqd-icon { width: 18px; height: 18px; }
+.lqd-rte-body:focus { outline: none; }
+.lqd-rte-body:empty::before { content: attr(data-placeholder); color: var(--ink-muted); }
+.lqd-rte-body ul { list-style: disc; padding-left: 1.4em; }
+.lqd-rte-body ol { list-style: decimal; padding-left: 1.4em; }
+.lqd-rte-body h2 { font-size: 22px; line-height: 30px; font-weight: 700; margin: var(--space-4) 0 var(--space-2); }
+.lqd-rte-body h3 { font-size: 18px; line-height: 26px; font-weight: 700; margin: var(--space-3) 0 var(--space-2); }
+.lqd-rte-body a { color: var(--link); text-decoration: underline; }
+.lqd-rte-body img { max-width: 100%; height: auto; border-radius: var(--radius-md); margin: var(--space-2) auto; }
+.lqd-rte-body blockquote { border-left: 3px solid var(--accent); padding-left: var(--space-3); color: var(--ink-muted); }
+
+/* Quản trị — thanh bên trên di động */
+.lqd-admin-menu-btn { display: none; }
+@media (max-width: 860px) {
+  .lqd-admin-menu-btn { display: inline-grid; }
+  .lqd-admin-side.is-open { display: flex; position: fixed; inset: 0 auto 0 0; width: 280px; z-index: 40; overflow-y: auto; box-shadow: var(--shadow-search); }
+  .lqd-admin-top { padding: 0 var(--space-4); }
+  .lqd-admin-search { width: auto; flex: 1; }
+  .lqd-admin-user span { display: none; }
+  .lqd-admin-content { padding: var(--space-4); }
+  .lqd-admin-head { flex-direction: column; align-items: flex-start; }
+  .lqd-toolbar-search { width: 100%; }
+}
+.lqd-admin-side nav { display: flex; flex-direction: column; }
+.lqd-admin-logout { border: 0; background: none; font: inherit; cursor: pointer; text-align: left; width: 100%; }
+
+/* Bảng quản trị: hàng có thể kéo thả */
+.lqd-table tr.is-dragging { opacity: .5; }
+.lqd-table tr.is-drop-target td { box-shadow: inset 0 2px 0 var(--accent); }
+.lqd-star { border: 0; background: none; padding: 4px; cursor: pointer; }
+.lqd-media-add { width: 100%; }
+.lqd-table-wrap .lqd-empty { border: 0; border-radius: 0; }
+.lqd-detail { display: grid; grid-template-columns: 140px 1fr; gap: var(--space-2) var(--space-4); font-size: 14px; line-height: 22px; }
+.lqd-detail dt { color: var(--ink-muted); }
+.lqd-detail dd { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.lqd-spinner { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--border); border-top-color: var(--primary); animation: lqd-spin .8s linear infinite; }
+@keyframes lqd-spin { to { transform: rotate(360deg); } }
+
+/* Banner trong cột bên (340px): ảnh trên, chữ dưới */
+.lqd-aside .lqd-promo { grid-template-columns: 1fr; min-height: 0; }
+.lqd-aside .lqd-promo-media { order: -1; min-height: 140px; aspect-ratio: 16 / 9; }
+.lqd-aside .lqd-promo-text { padding: var(--space-6); }
+.lqd-aside .lqd-promo h3 { font-size: 22px; line-height: 30px; }

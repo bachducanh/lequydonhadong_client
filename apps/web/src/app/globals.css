@@ -1,0 +1,73 @@
+@import "tailwindcss";
+@import "../styles/tokens.css";
+@import "../styles/design.css" layer(components);
+@import "../styles/extras.css" layer(components);
+
+/* Token tĩnh của Tailwind (bo góc, đổ bóng, font) — dùng chung với CSS component */
+@theme {
+  --font-sans: var(--font-be-vietnam), "Be Vietnam Pro", "Segoe UI", system-ui, sans-serif;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+  --radius-pill: 999px;
+  --shadow-card: 0 1px 2px rgba(13, 71, 161, 0.06), 0 4px 16px rgba(13, 71, 161, 0.06);
+  --shadow-hover: 0 4px 8px rgba(13, 71, 161, 0.08), 0 16px 32px rgba(13, 71, 161, 0.12);
+  --shadow-search: 0 8px 24px rgba(7, 22, 41, 0.18);
+}
+
+/* Màu ngữ nghĩa đổi theo theme: bg-surface, text-ink, text-ink-muted, border-border, bg-primary… */
+@theme inline {
+  --color-brand-navy: var(--brand-navy);
+  --color-brand-blue: var(--brand-blue);
+  --color-brand-sky: var(--brand-sky);
+  --color-brand-mist: var(--brand-mist);
+  --color-brand-red: var(--brand-red);
+  --color-brand-gold: var(--brand-gold);
+  --color-navy-900: var(--navy-900);
+  --color-surface: var(--surface);
+  --color-surface-alt: var(--surface-alt);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-sunken: var(--surface-sunken);
+  --color-surface-inverse: var(--surface-inverse);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-on-inverse: var(--on-inverse);
+  --color-on-inverse-muted: var(--on-inverse-muted);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-on-primary: var(--on-primary);
+  --color-cta: var(--cta);
+  --color-on-cta: var(--on-cta);
+  --color-link: var(--link);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-primary-text: var(--primary-text);
+  --color-highlight: var(--highlight);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    font-family: var(--font-sans);
+    background: var(--surface);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 700;
+  }
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+}
