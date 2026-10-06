@@ -24,9 +24,17 @@ export const CurrentUser = createParamDecorator(
   (_: unknown, ctx: ExecutionContext) => ctx.switchToHttp().getRequest<AuthedRequest>().user as AuthUser,
 );
 
-export const ClientIp = createParamDecorator(
-  (_: unknown, ctx: ExecutionContext) => ctx.switchToHttp().getRequest<Request>().ip ?? 'unknown',
-);
+/**
+ * IP thật của người dùng. Sau Cloudflare, X-Forwarded-For có thể bị giả mạo ở phần đầu,
+ * còn CF-Connecting-IP do Cloudflare (hoặc lớp BFF của web) gắn nên đáng tin hơn.
+ * API chỉ nên được truy cập qua Cloudflare Tunnel hoặc mạng nội bộ Docker.
+ */
+export function clientIp(req: Request): string {
+  const cf = req.headers['cf-connecting-ip'];
+  return (Array.isArray(cf) ? cf[0] : cf) || req.ip || 'unknown';
+}
+
+export const ClientIp = createParamDecorator((_: unknown, ctx: ExecutionContext) => clientIp(ctx.switchToHttp().getRequest<Request>()));
 
 export const RATE_LIMIT = 'rateLimit';
 export interface RateLimitOptions {

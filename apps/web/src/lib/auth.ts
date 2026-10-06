@@ -11,6 +11,15 @@ export interface TokenPair {
   refreshExpiresIn: number;
 }
 
+/**
+ * Header IP người dùng chuyển tiếp cho API (dùng cho giới hạn tần suất).
+ * Sau Cloudflare ưu tiên CF-Connecting-IP; nếu không có thì lấy phần đầu X-Forwarded-For.
+ */
+export function clientIpHeaders(headers: Headers): Record<string, string> {
+  const ip = headers.get('cf-connecting-ip') ?? headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? headers.get('x-real-ip');
+  return ip ? { 'cf-connecting-ip': ip, 'x-forwarded-for': ip } : {};
+}
+
 /** Chỉ bật cờ Secure khi website chạy HTTPS (chạy Docker trên http://localhost vẫn đăng nhập được). */
 const secure = () => (process.env.SITE_URL ?? '').startsWith('https://');
 

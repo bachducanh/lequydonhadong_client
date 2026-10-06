@@ -4,7 +4,7 @@
   "description": "Website Trường THPT Lê Quý Đôn – Hà Đông: API (NestJS) + Web (Next.js)",
   "scripts": {
     "setup": "npm install && npm --prefix apps/api install && npm --prefix apps/web install",
-    "db:up": "docker compose up -d postgres redis",
+    "db:up": "docker compose up -d --remove-orphans lqd-postgres lqd-redis",
     "db:down": "docker compose down",
     "db:migrate": "npm --prefix apps/api run prisma:migrate",
     "db:seed": "npm --prefix apps/api run prisma:seed",

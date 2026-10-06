@@ -12,7 +12,7 @@ import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { Role } from '@prisma/client';
 import { CacheService } from '../redis/cache.service';
-import { AuthedRequest, IS_PUBLIC, RATE_LIMIT, RateLimitOptions, ROLES } from './decorators';
+import { AuthedRequest, clientIp, IS_PUBLIC, RATE_LIMIT, RateLimitOptions, ROLES } from './decorators';
 
 interface AccessPayload {
   sub: string;
@@ -75,7 +75,7 @@ export class RateLimitGuard implements CanActivate {
     const opts = this.reflector.get<RateLimitOptions | undefined>(RATE_LIMIT, ctx.getHandler());
     if (!opts) return true;
     const req = ctx.switchToHttp().getRequest<AuthedRequest>();
-    const key = `rl:${ctx.getClass().name}.${ctx.getHandler().name}:${req.ip}`;
+    const key = `rl:${ctx.getClass().name}.${ctx.getHandler().name}:${clientIp(req)}`;
     const count = await this.cache.hit(key, opts.windowSec);
     if (count > opts.limit) {
       throw new HttpException('Bạn gửi quá nhiều yêu cầu, vui lòng thử lại sau ít phút.', HttpStatus.TOO_MANY_REQUESTS);

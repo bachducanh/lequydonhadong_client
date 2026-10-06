@@ -1,0 +1,39 @@
+# Ghi đè cho máy chủ thật (dùng kèm docker-compose.yml):
+#
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml --profile app up -d --build
+#
+# - Không mở cổng Postgres/Redis/API ra ngoài (cổng Docker công bố đi vòng qua UFW).
+# - Web chỉ mở 127.0.0.1:${WEB_LOCAL_PORT} để kiểm tra từ chính máy chủ.
+# - Web + API nối thêm vào mạng của Cloudflare Tunnel (TUNNEL_NETWORK) để tunnel trỏ tới
+#   http://lqd-web:3000 (và tuỳ chọn http://lqd-api:4000 cho app di động / tài liệu API).
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  lqd-postgres:
+    ports: !reset []
+    logging: *logging
+
+  lqd-redis:
+    ports: !reset []
+    logging: *logging
+
+  lqd-api:
+    ports: !reset []
+    networks: [default, tunnel]
+    logging: *logging
+
+  lqd-web:
+    ports: !override
+      - "127.0.0.1:${WEB_LOCAL_PORT:-3100}:3000"
+    networks: [default, tunnel]
+    logging: *logging
+
+networks:
+  tunnel:
+    external: true
+    name: ${TUNNEL_NETWORK:-lumibach_default}

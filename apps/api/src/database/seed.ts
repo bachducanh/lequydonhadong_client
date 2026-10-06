@@ -69,19 +69,34 @@ async function main() {
   }
 
   /* ---------- Người dùng ---------- */
+  // SEED_DEMO_USERS=false (máy chủ thật): chỉ tạo tài khoản admin, không tạo biên tập/giáo viên mẫu
+  const demoUsers = process.env.SEED_DEMO_USERS !== 'false';
   const password = await hash(process.env.SEED_ADMIN_PASSWORD ?? 'Admin@123', 10);
   const admin = await prisma.user.create({
-    data: { username: 'admin', email: 'minhanh@lqdhd.edu.vn', fullName: 'Trần Minh Anh', role: Role.ADMIN, department: 'Văn phòng', passwordHash: password, lastLoginAt: new Date() },
+    data: {
+      username: 'admin',
+      email: process.env.SEED_ADMIN_EMAIL ?? 'minhanh@lqdhd.edu.vn',
+      fullName: process.env.SEED_ADMIN_NAME ?? (demoUsers ? 'Trần Minh Anh' : 'Quản trị viên'),
+      role: Role.ADMIN,
+      department: 'Văn phòng',
+      passwordHash: password,
+    },
   });
-  const editor = await prisma.user.create({
-    data: { username: 'hongnhung', email: 'hongnhung@lqdhd.edu.vn', fullName: 'Nguyễn Hồng Nhung', role: Role.EDITOR, department: 'Đoàn trường', passwordHash: password, lastLoginAt: d('2026-10-04', '16:40') },
-  });
-  const teacher = await prisma.user.create({
-    data: { username: 'quocviet', email: 'quocviet@lqdhd.edu.vn', fullName: 'Phạm Quốc Việt', role: Role.TEACHER, department: 'Tổ Toán – Tin', passwordHash: password, lastLoginAt: d('2026-10-02') },
-  });
-  await prisma.user.create({
-    data: { username: 'thanhhuong', email: 'thanhhuong@lqdhd.edu.vn', fullName: 'Lý Thanh Hương', role: Role.TEACHER, department: 'Tổ Ngoại ngữ', status: UserStatus.LOCKED, passwordHash: password, lastLoginAt: d('2026-06-12') },
-  });
+  const editor = demoUsers
+    ? await prisma.user.create({
+        data: { username: 'hongnhung', email: 'hongnhung@lqdhd.edu.vn', fullName: 'Nguyễn Hồng Nhung', role: Role.EDITOR, department: 'Đoàn trường', passwordHash: password, lastLoginAt: d('2026-10-04', '16:40') },
+      })
+    : admin;
+  const teacher = demoUsers
+    ? await prisma.user.create({
+        data: { username: 'quocviet', email: 'quocviet@lqdhd.edu.vn', fullName: 'Phạm Quốc Việt', role: Role.TEACHER, department: 'Tổ Toán – Tin', passwordHash: password, lastLoginAt: d('2026-10-02') },
+      })
+    : admin;
+  if (demoUsers) {
+    await prisma.user.create({
+      data: { username: 'thanhhuong', email: 'thanhhuong@lqdhd.edu.vn', fullName: 'Lý Thanh Hương', role: Role.TEACHER, department: 'Tổ Ngoại ngữ', status: UserStatus.LOCKED, passwordHash: password, lastLoginAt: d('2026-06-12') },
+    });
+  }
 
   /* ---------- Chuyên mục ---------- */
   const cat: Record<string, string> = {};

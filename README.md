@@ -42,6 +42,12 @@ Tài khoản mẫu (mật khẩu = `SEED_ADMIN_PASSWORD`, mặc định `Admin@1
 
 > Đổi mật khẩu các tài khoản mẫu và hai khoá `JWT_*_SECRET` trước khi đưa lên mạng.
 
+## Phát hành lên máy chủ
+
+Xem [deploy/HUONG-DAN.md](deploy/HUONG-DAN.md): một lệnh `deploy/deploy.sh` trên máy chủ (Docker + Cloudflare Tunnel,
+không mở cổng ra Internet) và cách tạo subdomain `lequydonhadong.lumibach.com` trong Cloudflare.
+Trên máy chủ thật `SEED_DEMO_USERS=false`: chỉ tạo tài khoản `admin` với mật khẩu ngẫu nhiên.
+
 ## Chạy để phát triển
 
 Yêu cầu: Node.js ≥ 20, Docker.

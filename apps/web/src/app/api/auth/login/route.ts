@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { API_URL } from '@/lib/api';
-import { setAuthCookies, type TokenPair } from '@/lib/auth';
+import { clientIpHeaders, setAuthCookies, type TokenPair } from '@/lib/auth';
 
 export async function POST(req: NextRequest) {
   const { username, password, remember } = (await req.json().catch(() => ({}))) as {
@@ -12,10 +12,7 @@ export async function POST(req: NextRequest) {
   try {
     upstream = await fetch(`${API_URL}/api/v1/auth/login`, {
       method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        ...(req.headers.get('x-forwarded-for') ? { 'x-forwarded-for': req.headers.get('x-forwarded-for')! } : {}),
-      },
+      headers: { 'content-type': 'application/json', ...clientIpHeaders(req.headers) },
       body: JSON.stringify({ username, password }),
       cache: 'no-store',
     });

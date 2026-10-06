@@ -7,7 +7,7 @@
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 import { API_URL } from '@/lib/api';
-import { ACCESS_COOKIE, clearAuthCookies, REFRESH_COOKIE, REMEMBER_COOKIE, setAuthCookies, type TokenPair } from '@/lib/auth';
+import { ACCESS_COOKIE, clearAuthCookies, clientIpHeaders, REFRESH_COOKIE, REMEMBER_COOKIE, setAuthCookies, type TokenPair } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -24,8 +24,7 @@ async function proxy(req: NextRequest, ctx: { params: Promise<{ path: string[] }
   const headers = new Headers({ accept: req.headers.get('accept') ?? 'application/json' });
   const contentType = req.headers.get('content-type');
   if (contentType) headers.set('content-type', contentType);
-  const forwardedFor = req.headers.get('x-forwarded-for') ?? req.headers.get('x-real-ip');
-  if (forwardedFor) headers.set('x-forwarded-for', forwardedFor);
+  for (const [k, v] of Object.entries(clientIpHeaders(req.headers))) headers.set(k, v);
 
   const send = () => {
     if (accessToken) headers.set('authorization', `Bearer ${accessToken}`);
