@@ -195,7 +195,7 @@ export const RESOURCES: Record<string, ResourceConfig> = {
   /* ---------- Ảnh giới thiệu (slider) ---------- */
   'anh-gioi-thieu': {
     title: 'Ảnh giới thiệu (slider trang chủ)',
-    description: 'Mỗi ảnh là một slide tràn hết chiều ngang trang chủ (khuyến nghị 1920×600, để nội dung quan trọng ở giữa ảnh); tối đa 6 slide đang hiển thị.',
+    description: 'Mỗi ảnh là một slide tràn hết chiều ngang trang chủ (khuyến nghị 1920×800, để nội dung quan trọng ở giữa ảnh); tối đa 6 slide đang hiển thị.',
     endpoint: '/admin/slides',
     createLabel: 'Thêm slide',
     view: 'grid',
@@ -219,7 +219,7 @@ export const RESOURCES: Record<string, ResourceConfig> = {
         label: 'Ảnh banner',
         type: 'image',
         required: true,
-        hint: 'Ảnh ngang, khuyến nghị 1920×600 px (tỉ lệ 16:5). Ảnh khác tỉ lệ sẽ được cắt bớt phía trên/dưới, giữ phần giữa.',
+        hint: 'Ảnh ngang, khuyến nghị 1920×800 px (tỉ lệ 12:5). Ảnh khác tỉ lệ sẽ được cắt bớt phía trên/dưới, giữ phần giữa.',
       },
       { name: 'title', label: 'Tên slide', type: 'text', required: true, hint: 'Không hiển thị trên ảnh; dùng làm mô tả ảnh cho trình đọc màn hình và Google.' },
       { name: 'ctaHref', label: 'Liên kết khi bấm vào ảnh', type: 'text', placeholder: '/tuyen-sinh hoặc https://…', hint: 'Để trống nếu ảnh không cần bấm.' },

@@ -128,11 +128,11 @@
   .lqd-with-aside.lqd-aside-wide { grid-template-columns: minmax(0, 1fr) minmax(0, 440px); }
 }
 
-/* Banner trang chủ: ảnh tràn hết chiều ngang, khung 16:5 (1920×600), không cao quá 60% màn hình */
+/* Banner trang chủ: ảnh tràn hết chiều ngang, khung 12:5 (1920×800) */
 .lqd-banner { position: relative; overflow: hidden; background: var(--surface-inverse); touch-action: pan-y; }
 .lqd-banner-track { display: flex; transition: transform .6s cubic-bezier(.22, .61, .36, 1); }
 .lqd-banner-track.is-instant { transition: none; }
-.lqd-banner-slide { flex: 0 0 100%; aspect-ratio: 16 / 5; max-height: 60vh; min-width: 0; }
+.lqd-banner-slide { flex: 0 0 100%; aspect-ratio: 12 / 5; max-height: 78vh; min-width: 0; }
 .lqd-banner-slide > a, .lqd-banner-slide img { display: block; width: 100%; height: 100%; }
 .lqd-banner-slide img { object-fit: cover; object-position: center; user-select: none; }
 .lqd-banner-slide > a:focus-visible { outline-offset: -6px; }
