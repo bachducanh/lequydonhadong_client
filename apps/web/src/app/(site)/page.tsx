@@ -22,7 +22,7 @@ export default async function HomePage() {
     <>
       <Ticker items={home.tickers} lang={lang} />
       <HeroSlider slides={home.slides} />
-      <SearchPanel lang={lang} />
+      <SearchPanel lang={lang} overlap={false} />
 
       <section className="lqd-section">
         <div className="lqd-container">

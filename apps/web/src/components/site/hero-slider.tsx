@@ -1,42 +1,27 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { type ReactNode, useEffect, useRef, useState } from 'react';
 import { useI18n } from '@/components/i18n-provider';
 import { Button } from '@/components/ui/basics';
 import { Icon } from '@/components/ui/icon';
-import { Thumb } from '@/components/ui/thumb';
+import { cx } from '@/lib/cx';
+import { isExternal } from '@/lib/format';
 import type { Slide } from '@/lib/types';
 
 /**
- * Slider trang chủ (quản lý ở "Ảnh giới thiệu"): chữ trái, ảnh bo 24px phải.
- * Tự chuyển 6 giây, dừng khi rê chuột/focus; tắt tự chuyển khi người dùng chọn giảm chuyển động.
+ * Banner trang chủ (quản lý ở "Ảnh giới thiệu"): mỗi slide là một ảnh tràn hết chiều ngang (khung 1920×800).
+ * Bấm ảnh mở liên kết của slide. Tự chuyển 6 giây, dừng khi rê chuột/focus, vuốt được trên điện thoại;
+ * tắt hiệu ứng chuyển khi người dùng chọn giảm chuyển động. Chưa có ảnh nào: hiện dải chào mừng.
  */
 export function HeroSlider({ slides: input, interval = 6000, autoplay = true }: { slides: Slide[]; interval?: number; autoplay?: boolean }) {
   const { t } = useI18n();
-  // Chưa có slide nào trong "Ảnh giới thiệu": hiện một slide chào mừng mặc định
-  const slides: Slide[] = input.length
-    ? input
-    : [
-        {
-          id: 'default',
-          eyebrow: t.slider.defaultEyebrow,
-          title: t.slider.defaultTitle,
-          lead: t.slider.defaultLead,
-          ctaLabel: t.slider.defaultCta,
-          ctaHref: '/gioi-thieu',
-          secondaryLabel: t.slider.defaultSecondary,
-          secondaryHref: '/tin-tuc',
-          image: null,
-          imageAlt: null,
-          caption: null,
-          order: 0,
-          visible: true,
-        },
-      ];
+  const slides = input.filter((s) => s.image);
+  const n = slides.length;
   const [i, setI] = useState(0);
   const [paused, setPaused] = useState(false);
   const [reduced, setReduced] = useState(false);
-  const n = slides.length;
+  const touchX = useRef<number | null>(null);
 
   useEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -52,60 +37,94 @@ export function HeroSlider({ slides: input, interval = 6000, autoplay = true }: 
     return () => clearTimeout(timer);
   }, [i, paused, reduced, n, autoplay, interval]);
 
-  const s = slides[i] ?? slides[0];
+  useEffect(() => {
+    if (i >= n && n > 0) setI(0);
+  }, [i, n]);
+
+  if (!n) {
+    return (
+      <section className="lqd-hero-fallback">
+        <div className="lqd-container">
+          <p className="lqd-slide-eyebrow">{t.slider.defaultEyebrow}</p>
+          <h1>{t.slider.defaultTitle}</h1>
+          <p className="lqd-slide-lead">{t.slider.defaultLead}</p>
+          <div className="lqd-row" style={{ gap: 12 }}>
+            <Button variant="cta" size="lg" icon="arrow" href="/gioi-thieu">
+              {t.slider.defaultCta}
+            </Button>
+            <Button variant="inverse-outline" size="lg" href="/tin-tuc">
+              {t.slider.defaultSecondary}
+            </Button>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  const go = (k: number) => setI((k + n) % n);
 
   return (
     <section
-      className="lqd-slider"
+      className="lqd-banner"
       aria-roledescription="carousel"
       aria-label={t.slider.aria}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onFocus={() => setPaused(true)}
       onBlur={() => setPaused(false)}
+      onTouchStart={(e) => {
+        touchX.current = e.touches[0].clientX;
+        setPaused(true);
+      }}
+      onTouchEnd={(e) => {
+        const start = touchX.current;
+        touchX.current = null;
+        setPaused(false);
+        if (start === null || n < 2) return;
+        const dx = e.changedTouches[0].clientX - start;
+        if (Math.abs(dx) > 40) go(dx < 0 ? i + 1 : i - 1);
+      }}
     >
-      <div className="lqd-container lqd-slider-inner">
-        <div className="lqd-slide-text" key={`t${i}`} aria-live={paused ? 'polite' : 'off'}>
-          {s.eyebrow && <p className="lqd-slide-eyebrow">{s.eyebrow}</p>}
-          <h1>{s.title}</h1>
-          {s.lead && <p className="lqd-slide-lead">{s.lead}</p>}
-          <div className="lqd-row" style={{ gap: 12 }}>
-            {s.ctaLabel && (
-              <Button variant="cta" size="lg" icon="arrow" href={s.ctaHref || '#'}>
-                {s.ctaLabel}
-              </Button>
-            )}
-            {s.secondaryLabel && (
-              <Button variant="inverse-outline" size="lg" href={s.secondaryHref || '#'}>
-                {s.secondaryLabel}
-              </Button>
-            )}
-          </div>
-        </div>
-        <div className="lqd-slide-media" key={`m${i}`}>
-          <Thumb seed={i} src={s.image} alt={s.imageAlt ?? ''} className="lqd-slide-thumb">
-            {s.caption && <span className="lqd-slide-caption">{s.caption}</span>}
-          </Thumb>
-        </div>
-        {n > 1 && (
-          <div className="lqd-slider-controls">
-            <button type="button" className="lqd-slider-arrow" aria-label={t.slider.prev} onClick={() => setI((i - 1 + n) % n)}>
-              <Icon name="chevronLeft" />
-            </button>
-            <div className="lqd-slider-dots" role="tablist" aria-label={t.slider.choose}>
-              {slides.map((sl, k) => (
-                <button key={sl.id} type="button" role="tab" aria-selected={k === i} aria-label={t.slider.slide(k + 1)} onClick={() => setI(k)} />
-              ))}
+      <div className={cx('lqd-banner-track', reduced && 'is-instant')} style={{ transform: `translateX(-${i * 100}%)` }}>
+        {slides.map((s, k) => {
+          const img = (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={s.image!} alt={s.imageAlt || s.title} loading={k === 0 ? 'eager' : 'lazy'} fetchPriority={k === 0 ? 'high' : 'auto'} draggable={false} />
+          );
+          let content: ReactNode = img;
+          if (s.ctaHref) {
+            content = isExternal(s.ctaHref) ? (
+              <a href={s.ctaHref} target="_blank" rel="noopener noreferrer" tabIndex={k === i ? 0 : -1} aria-label={s.title}>
+                {img}
+              </a>
+            ) : (
+              <Link href={s.ctaHref} tabIndex={k === i ? 0 : -1} aria-label={s.title}>
+                {img}
+              </Link>
+            );
+          }
+          return (
+            <div key={s.id} className="lqd-banner-slide" role="group" aria-roledescription="slide" aria-label={`${k + 1} / ${n}`} aria-hidden={k !== i}>
+              {content}
             </div>
-            <button type="button" className="lqd-slider-arrow" aria-label={t.slider.next} onClick={() => setI((i + 1) % n)}>
-              <Icon name="chevron" />
-            </button>
-            <span className="lqd-slider-count">
-              {String(i + 1).padStart(2, '0')} / {String(n).padStart(2, '0')}
-            </span>
-          </div>
-        )}
+          );
+        })}
       </div>
+      {n > 1 && (
+        <>
+          <button type="button" className="lqd-banner-arrow is-prev" aria-label={t.slider.prev} onClick={() => go(i - 1)}>
+            <Icon name="chevronLeft" />
+          </button>
+          <button type="button" className="lqd-banner-arrow is-next" aria-label={t.slider.next} onClick={() => go(i + 1)}>
+            <Icon name="chevron" />
+          </button>
+          <div className="lqd-banner-dots" role="tablist" aria-label={t.slider.choose}>
+            {slides.map((s, k) => (
+              <button key={s.id} type="button" role="tab" aria-selected={k === i} aria-label={t.slider.slide(k + 1)} onClick={() => setI(k)} />
+            ))}
+          </div>
+        </>
+      )}
     </section>
   );
 }
