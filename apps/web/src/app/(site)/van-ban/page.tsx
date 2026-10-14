@@ -3,10 +3,15 @@ import { DocumentList, downloadToDoc, legalToDoc, PageHeader, SectionHeader } fr
 import { QuerySelect } from '@/components/site/query-select';
 import { Empty, FilterTabs, Pagination } from '@/components/ui/basics';
 import { apiSafe, emptyPage, pageOf, pick } from '@/lib/api';
+import { label } from '@/lib/i18n';
+import { getI18n } from '@/lib/i18n-server';
 import type { DownloadFile, LegalDocument, Paged } from '@/lib/types';
 import { hrefWith } from '@/lib/url';
 
-export const metadata: Metadata = { title: 'Văn bản & Tài liệu', description: 'Văn bản pháp quy của Bộ, Sở GD&ĐT, nhà trường và các biểu mẫu tải về.' };
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getI18n();
+  return { title: t.docs.title, description: t.docs.desc };
+}
 
 type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> };
 
@@ -14,6 +19,7 @@ const TYPE_ORDER = ['Luật', 'Nghị định', 'Thông tư', 'Quyết định',
 
 export default async function DocumentsPage({ searchParams }: Props) {
   const sp = await searchParams;
+  const { lang, t } = await getI18n();
   const q = pick(sp, 'q');
   const type = pick(sp, 'loai');
   const issuer = pick(sp, 'co-quan');
@@ -26,11 +32,11 @@ export default async function DocumentsPage({ searchParams }: Props) {
   ]);
 
   const counts = docs.meta.counts ?? {};
-  const rank = (t: string) => (TYPE_ORDER.includes(t) ? TYPE_ORDER.indexOf(t) : TYPE_ORDER.length);
+  const rank = (v: string) => (TYPE_ORDER.includes(v) ? TYPE_ORDER.indexOf(v) : TYPE_ORDER.length);
   const types = Object.keys(counts)
     .filter((k) => k !== 'ALL')
     .sort((a, b) => rank(a) - rank(b));
-  const typeTabs = [{ label: 'Tất cả', value: undefined as string | undefined, count: counts.ALL ?? 0 }, ...types.map((t) => ({ label: t, value: t, count: counts[t] }))];
+  const typeTabs = [{ label: t.common.all, value: undefined as string | undefined, count: counts.ALL ?? 0 }, ...types.map((v) => ({ label: label(lang, 'docType', v), value: v, count: counts[v] }))];
   const issuers = (docs.meta.issuers as string[] | undefined) ?? [];
   const fileCats = (files.meta.categories as string[] | undefined) ?? [];
   const params = { q, loai: type, 'co-quan': issuer, nhom: fileCategory };
@@ -38,47 +44,51 @@ export default async function DocumentsPage({ searchParams }: Props) {
   return (
     <>
       <PageHeader
-        breadcrumb={[{ label: 'Trang chủ', href: '/' }, { label: 'Văn bản' }]}
-        eyebrow="Văn bản"
-        title="Văn bản & Tài liệu"
-        description="Văn bản pháp quy của Bộ, Sở GD&ĐT, nhà trường và các biểu mẫu tải về."
-        search={{ action: '/van-ban', placeholder: 'Tìm theo số hiệu, trích yếu…', defaultValue: q, hidden: { loai: type, 'co-quan': issuer } }}
+        lang={lang}
+        breadcrumb={[{ label: t.common.home, href: '/' }, { label: t.docs.eyebrow }]}
+        eyebrow={t.docs.eyebrow}
+        title={t.docs.title}
+        description={t.docs.desc}
+        search={{ action: '/van-ban', placeholder: t.docs.searchPlaceholder, defaultValue: q, hidden: { loai: type, 'co-quan': issuer } }}
       />
       <section className="lqd-section">
         <div className="lqd-container lqd-stack" style={{ gap: 48 }}>
           <div>
-            <SectionHeader eyebrow="Văn bản pháp quy" title="Văn bản pháp quy" />
+            <SectionHeader eyebrow={t.docs.legalEyebrow} title={t.docs.legalTitle} />
             <div className="lqd-listbar">
               <FilterTabs
-                value={Math.max(0, typeTabs.findIndex((t) => t.value === type))}
-                items={typeTabs.map((t) => ({ label: t.label, count: t.count, href: hrefWith('/van-ban', { ...params, loai: t.value }) }))}
+                value={Math.max(0, typeTabs.findIndex((tab) => tab.value === type))}
+                items={typeTabs.map((tab) => ({ label: tab.label, count: tab.count, href: hrefWith('/van-ban', { ...params, loai: tab.value }) }))}
               />
-              <QuerySelect name="co-quan" label="Cơ quan ban hành" value={issuer} options={[{ value: '', label: 'Mọi cơ quan' }, ...issuers.map((i) => ({ value: i, label: i }))]} />
+              {issuers.length > 1 && (
+                <QuerySelect
+                  name="co-quan"
+                  label={t.docs.issuer}
+                  value={issuer}
+                  options={[{ value: '', label: t.docs.allIssuers }, ...issuers.map((i) => ({ value: i, label: label(lang, 'issuer', i) }))]}
+                />
+              )}
             </div>
-            {docs.data.length ? (
-              <DocumentList items={docs.data.map((d) => legalToDoc(d))} />
-            ) : (
-              <Empty icon="scale" title="Không có văn bản phù hợp" />
-            )}
-            <div style={{ display: 'flex', justifyContent: 'center', marginTop: 32 }}>
-              <Pagination page={page} total={docs.meta.totalPages} hrefFor={(p) => hrefWith('/van-ban', { ...params, trang: p })} />
+            {docs.data.length ? <DocumentList items={docs.data.map((d) => legalToDoc(d, lang))} lang={lang} /> : <Empty icon="scale" title={t.docs.empty} />}
+            <div className="lqd-pager-row">
+              <Pagination lang={lang} page={page} total={docs.meta.totalPages} hrefFor={(p) => hrefWith('/van-ban', { ...params, trang: p })} />
             </div>
           </div>
 
           <div id="tai-lieu">
-            <SectionHeader eyebrow="Download" title="Tài liệu tải về" description="Biểu mẫu, hồ sơ và đề cương ôn tập." />
+            <SectionHeader eyebrow={t.docs.dlEyebrow} title={t.docs.dlTitle} description={t.docs.dlDesc} />
             {fileCats.length > 1 && (
               <div className="lqd-listbar">
                 <FilterTabs
                   value={Math.max(0, ['', ...fileCats].indexOf(fileCategory ?? ''))}
-                  items={[{ label: 'Tất cả', value: '' }, ...fileCats.map((c) => ({ label: c, value: c }))].map((c) => ({
+                  items={[{ label: t.common.all, value: '' }, ...fileCats.map((c) => ({ label: label(lang, 'fileCategory', c), value: c }))].map((c) => ({
                     label: c.label,
                     href: `${hrefWith('/van-ban', { ...params, nhom: c.value, trang: page })}#tai-lieu`,
                   }))}
                 />
               </div>
             )}
-            {files.data.length ? <DocumentList items={files.data.map(downloadToDoc)} /> : <Empty icon="download" title="Chưa có tài liệu" />}
+            {files.data.length ? <DocumentList items={files.data.map((f) => downloadToDoc(f, lang))} lang={lang} /> : <Empty icon="download" title={t.docs.noFiles} />}
           </div>
         </div>
       </section>

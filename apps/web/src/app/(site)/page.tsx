@@ -3,7 +3,8 @@ import { HeroSlider } from '@/components/site/hero-slider';
 import { PromoBanner } from '@/components/site/interactive';
 import { Empty } from '@/components/ui/basics';
 import { apiSafe } from '@/lib/api';
-import { DEPARTMENTS } from '@/lib/site';
+import { getI18n } from '@/lib/i18n-server';
+import { departments } from '@/lib/site';
 import type { HomeData } from '@/lib/types';
 
 const EMPTY: HomeData = { tickers: [], slides: [], featured: null, news: [], announcements: [], documents: [], albums: [], banner: null, links: [] };
@@ -13,29 +14,32 @@ const EMPTY: HomeData = { tickers: [], slides: [], featured: null, news: [], ann
  * Banner tuyển sinh → Tổ chuyên môn → Thư viện ảnh → Liên kết hữu ích.
  */
 export default async function HomePage() {
-  const home = await apiSafe<HomeData>('/home', undefined, EMPTY);
+  const [{ lang, t }, home] = await Promise.all([getI18n(), apiSafe<HomeData>('/home', undefined, EMPTY)]);
+  const h = t.home;
   const news = home.news.slice(0, 3);
 
   return (
     <>
-      <Ticker items={home.tickers} />
+      <Ticker items={home.tickers} lang={lang} />
       <HeroSlider slides={home.slides} />
-      <SearchPanel />
+      <SearchPanel lang={lang} />
 
       <section className="lqd-section">
         <div className="lqd-container">
-          <SectionHeader eyebrow="Tin tức" title="Hoạt động nổi bật" description="Những câu chuyện mới nhất từ học sinh, thầy cô và các câu lạc bộ." actionLabel="Xem tất cả tin tức" actionHref="/tin-tuc" />
+          <SectionHeader eyebrow={h.newsEyebrow} title={h.newsTitle} description={h.newsDesc} actionLabel={h.newsAll} actionHref="/tin-tuc" />
           {home.featured || news.length ? (
             <div className="lqd-stack" style={{ gap: 24 }}>
-              {home.featured && <NewsCard post={home.featured} featured />}
-              <div className="lqd-grid-3">
-                {news.map((n) => (
-                  <NewsCard key={n.id} post={n} />
-                ))}
-              </div>
+              {home.featured && <NewsCard post={home.featured} featured lang={lang} />}
+              {news.length > 0 && (
+                <div className="lqd-grid-3">
+                  {news.map((n) => (
+                    <NewsCard key={n.id} post={n} lang={lang} />
+                  ))}
+                </div>
+              )}
             </div>
           ) : (
-            <Empty icon="fileText" title="Chưa có tin bài" />
+            <Empty icon="fileText" title={h.noNews} />
           )}
         </div>
       </section>
@@ -43,12 +47,12 @@ export default async function HomePage() {
       <section className="lqd-section lqd-section-alt">
         <div className="lqd-container lqd-split">
           <div>
-            <SectionHeader eyebrow="Thông báo" title="Thông báo mới" actionLabel="Tất cả thông báo" actionHref="/tin-tuc?chuyen-muc=thong-bao" />
-            {home.announcements.length ? <AnnouncementList items={home.announcements} /> : <Empty icon="bell" title="Chưa có thông báo" />}
+            <SectionHeader eyebrow={h.annEyebrow} title={h.annTitle} actionLabel={h.annAll} actionHref="/tin-tuc?chuyen-muc=thong-bao" />
+            {home.announcements.length ? <AnnouncementList items={home.announcements} lang={lang} /> : <Empty icon="bell" title={h.noAnn} />}
           </div>
           <div>
-            <SectionHeader eyebrow="Văn bản" title="Văn bản mới" actionLabel="Xem thêm" actionHref="/van-ban" />
-            {home.documents.length ? <DocumentList items={home.documents.map((d) => legalToDoc(d, false))} /> : <Empty icon="scale" title="Chưa có văn bản" />}
+            <SectionHeader eyebrow={h.docEyebrow} title={h.docTitle} actionLabel={t.common.more} actionHref="/van-ban" />
+            {home.documents.length ? <DocumentList items={home.documents.map((d) => legalToDoc(d, lang, false))} lang={lang} /> : <Empty icon="scale" title={h.noDocs} />}
           </div>
         </div>
       </section>
@@ -63,10 +67,10 @@ export default async function HomePage() {
 
       <section className="lqd-section" style={home.banner ? { paddingTop: 0 } : undefined} id="to-chuyen-mon">
         <div className="lqd-container">
-          <SectionHeader eyebrow="Tổ chức nhà trường" title="Tổ chuyên môn" description="Đội ngũ giáo viên theo từng lĩnh vực, cùng các câu lạc bộ học thuật." actionLabel="Xem tất cả" actionHref="/gioi-thieu" />
+          <SectionHeader eyebrow={h.deptEyebrow} title={h.deptTitle} description={h.deptDesc} actionLabel={t.common.viewAll} actionHref="/gioi-thieu" />
           <div className="lqd-grid-4">
-            {DEPARTMENTS.map((d) => (
-              <ProgramCard key={d.title} icon={d.icon} label="Tổ" title={d.title} description={d.description} meta={d.meta} actionLabel="Tìm hiểu" href={d.href} />
+            {departments(lang).map((d) => (
+              <ProgramCard key={d.title} icon={d.icon} label={h.deptLabel} title={d.title} description={d.description} meta={d.meta} actionLabel={t.common.learnMore} href={d.href} />
             ))}
           </div>
         </div>
@@ -74,15 +78,15 @@ export default async function HomePage() {
 
       <section className="lqd-section lqd-section-alt">
         <div className="lqd-container">
-          <SectionHeader eyebrow="Thư viện ảnh" title="Khoảnh khắc Lê Quý Đôn" actionLabel="Xem tất cả album" actionHref="/thu-vien" />
+          <SectionHeader eyebrow={h.galleryEyebrow} title={h.galleryTitle} actionLabel={h.galleryAll} actionHref="/thu-vien" />
           {home.albums.length ? (
             <div className="lqd-grid-3">
               {home.albums.map((a) => (
-                <AlbumCard key={a.id} album={a} />
+                <AlbumCard key={a.id} album={a} lang={lang} />
               ))}
             </div>
           ) : (
-            <Empty icon="images" title="Chưa có album" />
+            <Empty icon="images" title={h.noAlbums} />
           )}
         </div>
       </section>
@@ -90,8 +94,8 @@ export default async function HomePage() {
       {home.links.length > 0 && (
         <section className="lqd-section" id="lien-ket">
           <div className="lqd-container">
-            <SectionHeader eyebrow="Liên kết" title="Liên kết hữu ích" />
-            <QuickLinks items={home.links} />
+            <SectionHeader eyebrow={h.linksEyebrow} title={h.linksTitle} />
+            <QuickLinks items={home.links} lang={lang} />
           </div>
         </section>
       )}

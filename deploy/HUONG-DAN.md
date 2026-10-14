@@ -65,8 +65,18 @@ Tài khoản quản trị: `admin`. Mật khẩu ngẫu nhiên nằm trong `.env
 grep SEED_ADMIN_PASSWORD /opt/lequydonhadong/.env
 ```
 
-Đăng nhập tại `/dang-nhap` → bấm tên tài khoản góc phải → **Đổi mật khẩu**. Dữ liệu mẫu (tin bài, văn bản, album…)
-có thể sửa/xoá trong trang quản trị.
+Đăng nhập tại `/dang-nhap` → bấm tên tài khoản góc phải → **Đổi mật khẩu**.
+
+### Xoá dữ liệu mẫu trước khi nhập dữ liệu thật
+
+Giữ tài khoản, cây chuyên mục và kiểu thư viện; xoá toàn bộ tin bài, văn bản, album, hỏi đáp, banner, liên kết… và tệp mẫu.
+Nên sao lưu trước:
+
+```bash
+cd /opt/lequydonhadong
+bash deploy/backup.sh
+docker compose -f docker-compose.yml -f docker-compose.prod.yml --profile app exec lqd-api node dist/database/clear-content.js --yes
+```
 
 ## 4. Vận hành
 

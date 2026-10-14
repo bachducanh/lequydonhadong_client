@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useI18n } from '@/components/i18n-provider';
 import { Button } from '@/components/ui/basics';
 import { Icon } from '@/components/ui/icon';
 import { Thumb } from '@/components/ui/thumb';
@@ -10,7 +11,28 @@ import type { Slide } from '@/lib/types';
  * Slider trang chủ (quản lý ở "Ảnh giới thiệu"): chữ trái, ảnh bo 24px phải.
  * Tự chuyển 6 giây, dừng khi rê chuột/focus; tắt tự chuyển khi người dùng chọn giảm chuyển động.
  */
-export function HeroSlider({ slides, interval = 6000, autoplay = true }: { slides: Slide[]; interval?: number; autoplay?: boolean }) {
+export function HeroSlider({ slides: input, interval = 6000, autoplay = true }: { slides: Slide[]; interval?: number; autoplay?: boolean }) {
+  const { t } = useI18n();
+  // Chưa có slide nào trong "Ảnh giới thiệu": hiện một slide chào mừng mặc định
+  const slides: Slide[] = input.length
+    ? input
+    : [
+        {
+          id: 'default',
+          eyebrow: t.slider.defaultEyebrow,
+          title: t.slider.defaultTitle,
+          lead: t.slider.defaultLead,
+          ctaLabel: t.slider.defaultCta,
+          ctaHref: '/gioi-thieu',
+          secondaryLabel: t.slider.defaultSecondary,
+          secondaryHref: '/tin-tuc',
+          image: null,
+          imageAlt: null,
+          caption: null,
+          order: 0,
+          visible: true,
+        },
+      ];
   const [i, setI] = useState(0);
   const [paused, setPaused] = useState(false);
   const [reduced, setReduced] = useState(false);
@@ -26,18 +48,17 @@ export function HeroSlider({ slides, interval = 6000, autoplay = true }: { slide
 
   useEffect(() => {
     if (paused || reduced || n < 2 || !autoplay) return;
-    const t = setTimeout(() => setI((i + 1) % n), interval);
-    return () => clearTimeout(t);
+    const timer = setTimeout(() => setI((i + 1) % n), interval);
+    return () => clearTimeout(timer);
   }, [i, paused, reduced, n, autoplay, interval]);
 
-  if (!n) return null;
   const s = slides[i] ?? slides[0];
 
   return (
     <section
       className="lqd-slider"
       aria-roledescription="carousel"
-      aria-label="Nổi bật"
+      aria-label={t.slider.aria}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onFocus={() => setPaused(true)}
@@ -68,15 +89,15 @@ export function HeroSlider({ slides, interval = 6000, autoplay = true }: { slide
         </div>
         {n > 1 && (
           <div className="lqd-slider-controls">
-            <button type="button" className="lqd-slider-arrow" aria-label="Slide trước" onClick={() => setI((i - 1 + n) % n)}>
+            <button type="button" className="lqd-slider-arrow" aria-label={t.slider.prev} onClick={() => setI((i - 1 + n) % n)}>
               <Icon name="chevronLeft" />
             </button>
-            <div className="lqd-slider-dots" role="tablist" aria-label="Chọn slide">
+            <div className="lqd-slider-dots" role="tablist" aria-label={t.slider.choose}>
               {slides.map((sl, k) => (
-                <button key={sl.id} type="button" role="tab" aria-selected={k === i} aria-label={`Slide ${k + 1}`} onClick={() => setI(k)} />
+                <button key={sl.id} type="button" role="tab" aria-selected={k === i} aria-label={t.slider.slide(k + 1)} onClick={() => setI(k)} />
               ))}
             </div>
-            <button type="button" className="lqd-slider-arrow" aria-label="Slide sau" onClick={() => setI((i + 1) % n)}>
+            <button type="button" className="lqd-slider-arrow" aria-label={t.slider.next} onClick={() => setI((i + 1) % n)}>
               <Icon name="chevron" />
             </button>
             <span className="lqd-slider-count">

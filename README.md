@@ -64,6 +64,14 @@ npm run dev            # API :4000 + Web :3000 (tự nạp lại khi sửa mã)
 
 Lệnh khác: `npm run build` (build cả hai), `npm --prefix apps/api run prisma:studio` (xem CSDL).
 
+## Ngôn ngữ & giao diện
+
+- Giao diện chỉ dùng chế độ sáng.
+- Song ngữ **Tiếng Việt / English** cho toàn bộ giao diện trang công khai: nút chọn ngôn ngữ kiểu edX ở thanh trên cùng,
+  trong menu di động và chân trang (lưu trong cookie `lqd_lang`). Từ điển ở `apps/web/src/lib/i18n.ts`.
+- Nội dung nhập trong quản trị (tiêu đề, bài viết…) hiển thị đúng ngôn ngữ đã nhập; các nhãn cố định
+  (chuyên mục, loại văn bản, chủ đề hỏi đáp…) được dịch tự động. Trang quản trị giữ tiếng Việt.
+
 ## Trang & chức năng
 
 **Công khai** (`apps/web/src/app/(site)`)

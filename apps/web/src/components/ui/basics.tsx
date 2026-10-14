@@ -2,19 +2,21 @@ import Link from 'next/link';
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import { cx } from '@/lib/cx';
 import { isExternal } from '@/lib/format';
+import { dict, type Lang } from '@/lib/i18n';
 import type { Tone } from '@/lib/types';
 import { Icon, type IconName } from './icon';
 
 export const LOGO_SRC = '/images/lqd-logo.png';
 
-export function Logo({ size = 48, withText = true, inverse, href = '/' }: { size?: number; withText?: boolean; inverse?: boolean; href?: string }) {
+export function Logo({ size = 48, withText = true, inverse, href = '/', lang = 'vi' }: { size?: number; withText?: boolean; inverse?: boolean; href?: string; lang?: Lang }) {
+  const t = dict(lang).common;
   return (
-    <Link className={cx('lqd-logo', inverse && 'lqd-logo-inverse')} href={href} aria-label="Trường THPT Lê Quý Đôn – Hà Đông, trang chủ">
+    <Link className={cx('lqd-logo', inverse && 'lqd-logo-inverse')} href={href} aria-label={t.logoAria}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={LOGO_SRC} alt="" width={size} height={size} style={{ width: size, height: size }} />
       {withText && (
         <span className="lqd-logo-text">
-          <span className="lqd-logo-kicker">Trường THPT</span>
+          <span className="lqd-logo-kicker">{t.logoKicker}</span>
           <b>Lê Quý Đôn – Hà Đông</b>
         </span>
       )}
@@ -164,8 +166,21 @@ export function Empty({ icon = 'inbox', title, children }: { icon?: IconName; ti
 /**
  * Phân trang. `hrefFor` cho trang công khai (link, không cần JS); `onChange` cho trang quản trị.
  */
-export function Pagination({ page, total, hrefFor, onChange }: { page: number; total: number; hrefFor?: (p: number) => string; onChange?: (p: number) => void }) {
+export function Pagination({
+  page,
+  total,
+  hrefFor,
+  onChange,
+  lang = 'vi',
+}: {
+  page: number;
+  total: number;
+  hrefFor?: (p: number) => string;
+  onChange?: (p: number) => void;
+  lang?: Lang;
+}) {
   if (total <= 1) return null;
+  const t = dict(lang).pagination;
   const pages: (number | '…')[] = [];
   for (let k = 1; k <= total; k++) {
     if (total <= 7 || k <= 3 || k === total || Math.abs(k - page) <= 1) pages.push(k);
@@ -193,10 +208,10 @@ export function Pagination({ page, total, hrefFor, onChange }: { page: number; t
     );
   };
   return (
-    <nav className="lqd-pager" aria-label="Phân trang">
-      {item(page - 1, <Icon name="chevronLeft" />, { disabled: page <= 1, aria: 'Trang trước' })}
+    <nav className="lqd-pager" aria-label={t.nav}>
+      {item(page - 1, <Icon name="chevronLeft" />, { disabled: page <= 1, aria: t.prev })}
       {pages.map((p, k) => (p === '…' ? <span key={`gap-${k}`} className="lqd-pager-gap">…</span> : item(p, p, { current: p === page })))}
-      {item(page + 1, <Icon name="chevron" />, { disabled: page >= total, aria: 'Trang sau' })}
+      {item(page + 1, <Icon name="chevron" />, { disabled: page >= total, aria: t.next })}
     </nav>
   );
 }

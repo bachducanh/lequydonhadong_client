@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Be_Vietnam_Pro } from 'next/font/google';
+import { I18nProvider } from '@/components/i18n-provider';
+import { getI18n } from '@/lib/i18n-server';
 import './globals.css';
 
 const font = Be_Vietnam_Pro({
@@ -9,27 +11,30 @@ const font = Be_Vietnam_Pro({
   display: 'swap',
 });
 
-export const metadata: Metadata = {
-  metadataBase: new URL(process.env.SITE_URL ?? 'http://localhost:3000'),
-  title: {
-    default: 'Trường THPT Lê Quý Đôn – Hà Đông',
-    template: '%s · THPT Lê Quý Đôn – Hà Đông',
-  },
-  description: 'Website chính thức Trường THPT Lê Quý Đôn – Hà Đông: tin tức, thông báo, văn bản, tuyển sinh, thư viện và hỏi đáp.',
-  openGraph: { type: 'website', locale: 'vi_VN', siteName: 'Trường THPT Lê Quý Đôn – Hà Đông' },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { lang, t } = await getI18n();
+  return {
+    metadataBase: new URL(process.env.SITE_URL ?? 'http://localhost:3000'),
+    title: { default: t.common.siteName, template: `%s · ${t.common.siteName}` },
+    description: t.meta.description,
+    openGraph: { type: 'website', locale: lang === 'en' ? 'en_US' : 'vi_VN', siteName: t.common.siteName },
+  };
+}
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#071F4A' },
-    { media: '(prefers-color-scheme: dark)', color: '#050F1F' },
-  ],
+  width: 'device-width',
+  initialScale: 1,
+  themeColor: '#071F4A',
+  colorScheme: 'light',
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const { lang } = await getI18n();
   return (
-    <html lang="vi" className={font.variable}>
-      <body>{children}</body>
+    <html lang={lang} className={font.variable}>
+      <body>
+        <I18nProvider lang={lang}>{children}</I18nProvider>
+      </body>
     </html>
   );
 }

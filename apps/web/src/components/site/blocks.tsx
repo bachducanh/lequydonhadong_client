@@ -7,6 +7,7 @@ import { Icon, type IconName } from '@/components/ui/icon';
 import { Thumb } from '@/components/ui/thumb';
 import { cx } from '@/lib/cx';
 import { dayMonth, fileExt, formatDate, formatNumber, formatSize, seedOf, toTone } from '@/lib/format';
+import { dict, label, type Lang } from '@/lib/i18n';
 import { SEARCH_CHIPS } from '@/lib/site';
 import type { AlbumCard as Album, DownloadFile, LegalDocument, LinkItem, PostCard, TickerItem, Tone } from '@/lib/types';
 
@@ -14,42 +15,47 @@ import type { AlbumCard as Album, DownloadFile, LegalDocument, LinkItem, PostCar
 
 export function SearchBar({
   action = '/tim-kiem',
-  placeholder = 'Tìm tin tức, thông báo, văn bản…',
+  placeholder,
   defaultValue,
-  buttonLabel = 'Tìm kiếm',
   hidden,
+  lang = 'vi',
 }: {
   action?: string;
   placeholder?: string;
   defaultValue?: string;
-  buttonLabel?: string;
   hidden?: Record<string, string | undefined>;
+  lang?: Lang;
 }) {
+  const t = dict(lang).search;
   return (
     <Form action={action} className="lqd-search" role="search">
       <Icon name="search" />
-      <input name="q" type="search" placeholder={placeholder} aria-label="Tìm kiếm" defaultValue={defaultValue} />
+      <input name="q" type="search" placeholder={placeholder ?? t.placeholder} aria-label={t.aria} defaultValue={defaultValue} enterKeyHint="search" />
       {Object.entries(hidden ?? {}).map(([k, v]) => (v ? <input key={k} type="hidden" name={k} value={v} /> : null))}
-      <button type="submit">{buttonLabel}</button>
+      <button type="submit" aria-label={t.button}>
+        <Icon name="search" className="lqd-search-btn-icon" />
+        <span className="lqd-search-btn-text">{t.button}</span>
+      </button>
     </Form>
   );
 }
 
-export function SearchPanel({ title = 'Bạn đang tìm thông tin gì?', description = 'Tìm nhanh thông báo, văn bản, lịch học và tài liệu của nhà trường.' }: { title?: string; description?: string }) {
+export function SearchPanel({ lang, overlap = true }: { lang: Lang; overlap?: boolean }) {
+  const t = dict(lang).search;
   return (
     <div className="lqd-container">
-      <div className="lqd-searchpanel">
+      <div className={cx('lqd-searchpanel', !overlap && 'lqd-searchpanel-flat')}>
         <div>
-          <h2>{title}</h2>
-          <p>{description}</p>
+          <h2>{t.panelTitle}</h2>
+          <p>{t.panelDesc}</p>
         </div>
         <div>
-          <SearchBar />
+          <SearchBar lang={lang} />
           <div className="lqd-chips">
-            <span>Tìm nhiều:</span>
+            <span>{t.popular}</span>
             {SEARCH_CHIPS.map((c) => (
-              <Link key={c} href={`/tim-kiem?q=${encodeURIComponent(c)}`}>
-                {c}
+              <Link key={c.q} href={`/tim-kiem?q=${encodeURIComponent(c.q)}`}>
+                {lang === 'en' ? c.en : c.q}
               </Link>
             ))}
           </div>
@@ -61,19 +67,20 @@ export function SearchPanel({ title = 'Bạn đang tìm thông tin gì?', descri
 
 /* ---------- Chữ chạy ---------- */
 
-export function Ticker({ items, label = 'Mới' }: { items: TickerItem[]; label?: string }) {
+export function Ticker({ items, lang = 'vi' }: { items: TickerItem[]; lang?: Lang }) {
   if (!items.length) return null;
+  const t = dict(lang).ticker;
   const row = (dup: boolean) =>
-    items.map((t) => (
-      <Link key={(dup ? 'd' : '') + t.id} href={t.link || '/tin-tuc'} tabIndex={dup ? -1 : undefined}>
+    items.map((it) => (
+      <Link key={(dup ? 'd' : '') + it.id} href={it.link || '/tin-tuc'} tabIndex={dup ? -1 : undefined}>
         <span className="lqd-ticker-dot" aria-hidden="true" />
-        {t.text}
+        {it.text}
       </Link>
     ));
   return (
-    <div className="lqd-ticker" role="region" aria-label="Tin nhanh">
+    <div className="lqd-ticker" role="region" aria-label={t.aria}>
       <div className="lqd-container">
-        <span className="lqd-ticker-label">{label}</span>
+        <span className="lqd-ticker-label">{t.label}</span>
         <div className="lqd-ticker-viewport">
           <div className="lqd-ticker-track">
             {row(false)}
@@ -108,12 +115,14 @@ export function PageHeader({
   title,
   description,
   search,
+  lang = 'vi',
 }: {
   breadcrumb?: { label: string; href?: string }[];
   eyebrow?: string;
   title: string;
   description?: string;
   search?: { action: string; placeholder?: string; defaultValue?: string; hidden?: Record<string, string | undefined> };
+  lang?: Lang;
 }) {
   return (
     <section className="lqd-pagehead">
@@ -124,7 +133,7 @@ export function PageHeader({
         {description && <p className="lqd-pagehead-lead">{description}</p>}
         {search && (
           <div style={{ marginTop: 24 }}>
-            <SearchBar action={search.action} placeholder={search.placeholder} defaultValue={search.defaultValue} hidden={search.hidden} />
+            <SearchBar action={search.action} placeholder={search.placeholder} defaultValue={search.defaultValue} hidden={search.hidden} lang={lang} />
           </div>
         )}
       </div>
@@ -134,13 +143,14 @@ export function PageHeader({
 
 /* ---------- Thẻ tin ---------- */
 
-export function NewsCard({ post, featured, compact, tone }: { post: PostCard; featured?: boolean; compact?: boolean; tone?: Tone }) {
+export function NewsCard({ post, featured, compact, tone, lang = 'vi' }: { post: PostCard; featured?: boolean; compact?: boolean; tone?: Tone; lang?: Lang }) {
+  const category = post.category ? label(lang, 'category', post.category.name, post.category.slug) : dict(lang).article.news;
   return (
     <Link className={cx('lqd-card lqd-news', featured && 'lqd-news-featured', compact && 'lqd-news-compact')} href={`/tin-tuc/${post.slug}`}>
       <Thumb seed={seedOf(post.id)} src={post.thumbnail} alt="" className="lqd-news-media" />
       <div className="lqd-news-body">
         <div>
-          <Tag tone={tone ?? 'brand'}>{post.category?.name ?? 'Tin tức'}</Tag>
+          <Tag tone={tone ?? 'brand'}>{category}</Tag>
         </div>
         <h3>{post.title}</h3>
         {post.excerpt && !compact && <p>{post.excerpt}</p>}
@@ -150,7 +160,7 @@ export function NewsCard({ post, featured, compact, tone }: { post: PostCard; fe
           {!compact && post.views > 0 && (
             <span className="lqd-meta-sep">
               <Icon name="eye" />
-              {formatNumber(post.views)}
+              {formatNumber(post.views, lang)}
             </span>
           )}
         </div>
@@ -159,11 +169,11 @@ export function NewsCard({ post, featured, compact, tone }: { post: PostCard; fe
   );
 }
 
-export function AnnouncementList({ items }: { items: PostCard[] }) {
+export function AnnouncementList({ items, lang = 'vi' }: { items: PostCard[]; lang?: Lang }) {
   return (
     <ul className="lqd-ann-list">
       {items.map((it) => {
-        const { day, month } = dayMonth(it.publishedAt);
+        const { day, month } = dayMonth(it.publishedAt, lang);
         return (
           <li key={it.id}>
             <Link className="lqd-ann" href={`/tin-tuc/${it.slug}`}>
@@ -174,7 +184,7 @@ export function AnnouncementList({ items }: { items: PostCard[] }) {
               <div className="lqd-ann-main">
                 {it.badge && (
                   <div>
-                    <Tag tone={toTone(it.badgeTone)}>{it.badge}</Tag>
+                    <Tag tone={toTone(it.badgeTone)}>{label(lang, 'badge', it.badge)}</Tag>
                   </div>
                 )}
                 <h4>{it.title}</h4>
@@ -189,16 +199,16 @@ export function AnnouncementList({ items }: { items: PostCard[] }) {
   );
 }
 
-export function ProgramCard({ icon = 'book', label, title, description, meta, actionLabel = 'Xem', href = '#' }: { icon?: IconName; label?: string; title: ReactNode; description?: ReactNode; meta?: ReactNode; actionLabel?: string; href?: string }) {
+export function ProgramCard({ icon = 'book', label: tag, title, description, meta, actionLabel, href = '#' }: { icon?: IconName; label?: string; title: ReactNode; description?: ReactNode; meta?: ReactNode; actionLabel: string; href?: string }) {
   return (
     <Link className="lqd-card lqd-prog" href={href}>
       <div className="lqd-prog-top">
         <span className="lqd-prog-icon">
           <Icon name={icon} />
         </span>
-        {label && (
+        {tag && (
           <Tag tone="neutral" noIcon>
-            {label}
+            {tag}
           </Tag>
         )}
       </div>
@@ -215,7 +225,7 @@ export function ProgramCard({ icon = 'book', label, title, description, meta, ac
   );
 }
 
-export function AlbumCard({ album }: { album: Album }) {
+export function AlbumCard({ album, lang = 'vi' }: { album: Album; lang?: Lang }) {
   return (
     <Link className="lqd-album" href={`/thu-vien/album/${album.id}`}>
       <div className="lqd-album-stack">
@@ -224,7 +234,7 @@ export function AlbumCard({ album }: { album: Album }) {
         <Thumb seed={seedOf(album.id)} src={album.coverUrl} className="lqd-album-cover">
           <span className="lqd-album-count">
             <Icon name="image" />
-            {album.photoCount} ảnh
+            {dict(lang).common.photos(album.photoCount)}
           </span>
         </Thumb>
       </div>
@@ -254,28 +264,29 @@ export interface DocItem {
   extra?: string | null;
 }
 
-export const legalToDoc = (d: LegalDocument, withType = true): DocItem => ({
+export const legalToDoc = (d: LegalDocument, lang: Lang, withType = true): DocItem => ({
   id: d.id,
   title: d.title,
   ext: fileExt(d.fileName),
   href: d.fileUrl,
   code: d.code,
-  issuer: d.issuer,
+  issuer: label(lang, 'issuer', d.issuer),
   date: d.issuedAt ? formatDate(d.issuedAt) : null,
-  type: withType ? d.type : null,
+  type: withType ? label(lang, 'docType', d.type) : null,
 });
 
-export const downloadToDoc = (f: DownloadFile): DocItem => ({
+export const downloadToDoc = (f: DownloadFile, lang: Lang): DocItem => ({
   id: f.id,
   title: f.name,
   ext: fileExt(f.fileName),
   href: f.fileUrl ? `/api/bff/downloads/${f.id}/file` : null,
-  size: formatSize(f.fileSize),
-  type: f.category,
-  extra: `${formatNumber(f.downloads)} lượt tải`,
+  size: formatSize(f.fileSize, lang),
+  type: label(lang, 'fileCategory', f.category),
+  extra: dict(lang).common.downloads(formatNumber(f.downloads, lang)),
 });
 
-export function DocumentList({ items }: { items: DocItem[] }) {
+export function DocumentList({ items, lang = 'vi' }: { items: DocItem[]; lang?: Lang }) {
+  const t = dict(lang).common;
   return (
     <div className="lqd-doclist">
       {items.map((d) => (
@@ -295,29 +306,35 @@ export function DocumentList({ items }: { items: DocItem[] }) {
             <div className="lqd-doc-meta">
               {d.code && (
                 <span>
-                  Số hiệu: <b>{d.code}</b>
+                  {t.docNumber} <b>{d.code}</b>
                 </span>
               )}
               {d.issuer && <span>{d.issuer}</span>}
-              {d.date && <span>Ban hành: {d.date}</span>}
+              {d.date && (
+                <span>
+                  {t.issued} {d.date}
+                </span>
+              )}
               {d.size && <span>{d.size}</span>}
               {d.extra && <span>{d.extra}</span>}
             </div>
           </div>
-          {d.type && (
-            <Tag tone="neutral" noIcon>
-              {d.type}
-            </Tag>
-          )}
-          {d.href ? (
-            <Button variant="secondary" size="sm" iconLeft="download" href={d.href} download>
-              Tải về
-            </Button>
-          ) : (
-            <Button variant="secondary" size="sm" iconLeft="clock" disabled title="Nhà trường đang cập nhật tệp">
-              Đang cập nhật
-            </Button>
-          )}
+          <div className="lqd-doc-actions">
+            {d.type && (
+              <Tag tone="neutral" noIcon>
+                {d.type}
+              </Tag>
+            )}
+            {d.href ? (
+              <Button variant="secondary" size="sm" iconLeft="download" href={d.href} download>
+                {t.download}
+              </Button>
+            ) : (
+              <Button variant="secondary" size="sm" iconLeft="clock" disabled>
+                {t.updating}
+              </Button>
+            )}
+          </div>
         </div>
       ))}
     </div>
@@ -326,7 +343,7 @@ export function DocumentList({ items }: { items: DocItem[] }) {
 
 /* ---------- Liên kết hữu ích ---------- */
 
-export function QuickLinks({ items }: { items: LinkItem[] }) {
+export function QuickLinks({ items, lang = 'vi' }: { items: LinkItem[]; lang?: Lang }) {
   return (
     <div className="lqd-quick">
       {items.map((it) => {
@@ -347,7 +364,7 @@ export function QuickLinks({ items }: { items: LinkItem[] }) {
             {inner}
           </a>
         ) : (
-          <div key={it.id} className="lqd-quick-item" title="Đang cập nhật">
+          <div key={it.id} className="lqd-quick-item" title={dict(lang).common.updating}>
             {inner}
           </div>
         );

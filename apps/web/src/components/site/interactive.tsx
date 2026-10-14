@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
+import { useI18n } from '@/components/i18n-provider';
 import { Button } from '@/components/ui/basics';
 import { Icon } from '@/components/ui/icon';
 import { Thumb } from '@/components/ui/thumb';
@@ -17,6 +18,7 @@ export function ViewTracker({ slug }: { slug: string }) {
 }
 
 export function CopyLinkButton() {
+  const { t } = useI18n();
   const [copied, setCopied] = useState(false);
   return (
     <Button
@@ -29,13 +31,14 @@ export function CopyLinkButton() {
         setTimeout(() => setCopied(false), 2000);
       }}
     >
-      {copied ? 'Đã sao chép' : 'Sao chép liên kết'}
+      {copied ? t.article.copied : t.article.copy}
     </Button>
   );
 }
 
 /** Banner quảng cáo nội bộ (khối nền primary có nút cta) — đếm lượt nhấp. */
 export function PromoBanner({ banner, seed = 1 }: { banner: Banner; seed?: number }) {
+  const { t } = useI18n();
   const href = banner.link || '#';
   const track = () => {
     navigator.sendBeacon?.(`/api/bff/banners/${banner.id}/click`);
@@ -47,7 +50,7 @@ export function PromoBanner({ banner, seed = 1 }: { banner: Banner; seed?: numbe
         <h3>{banner.title || banner.name}</h3>
         {banner.description && <p>{banner.description}</p>}
         <span className="lqd-promo-cta">
-          {banner.ctaLabel || 'Xem chi tiết'}
+          {banner.ctaLabel || t.common.viewDetails}
           <Icon name="arrow" />
         </span>
       </div>
@@ -67,6 +70,7 @@ export function PromoBanner({ banner, seed = 1 }: { banner: Banner; seed?: numbe
 
 /** Lưới ảnh album + xem ảnh lớn (phím ←/→/Esc). */
 export function PhotoGrid({ photos, title }: { photos: AlbumPhoto[]; title: string }) {
+  const { t } = useI18n();
   const [index, setIndex] = useState<number | null>(null);
   const n = photos.length;
   const go = useCallback((delta: number) => setIndex((i) => (i === null ? i : (i + delta + n) % n)), [n]);
@@ -91,7 +95,7 @@ export function PhotoGrid({ photos, title }: { photos: AlbumPhoto[]; title: stri
     <>
       <div className="lqd-photos">
         {photos.map((p, k) => (
-          <button key={p.id} type="button" className="lqd-photo" onClick={() => setIndex(k)} aria-label={`Xem ảnh ${k + 1}: ${p.caption ?? title}`}>
+          <button key={p.id} type="button" className="lqd-photo" onClick={() => setIndex(k)} aria-label={t.library.viewPhoto(k + 1, p.caption ?? title)}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={p.url} alt={p.caption ?? ''} loading="lazy" />
           </button>
@@ -103,17 +107,17 @@ export function PhotoGrid({ photos, title }: { photos: AlbumPhoto[]; title: stri
             <span>
               {title} · {index! + 1} / {n}
             </span>
-            <button type="button" onClick={() => setIndex(null)} aria-label="Đóng" autoFocus>
+            <button type="button" onClick={() => setIndex(null)} aria-label={t.library.close} autoFocus>
               <Icon name="x" />
             </button>
           </div>
           <div className="lqd-lightbox-stage">
-            <button type="button" onClick={() => go(-1)} aria-label="Ảnh trước">
+            <button type="button" onClick={() => go(-1)} aria-label={t.library.prevPhoto}>
               <Icon name="chevronLeft" />
             </button>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={current.url} alt={current.caption ?? ''} />
-            <button type="button" onClick={() => go(1)} aria-label="Ảnh sau">
+            <button type="button" onClick={() => go(1)} aria-label={t.library.nextPhoto}>
               <Icon name="chevron" />
             </button>
           </div>

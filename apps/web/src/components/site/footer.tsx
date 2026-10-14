@@ -1,24 +1,27 @@
 import Link from 'next/link';
 import { Logo } from '@/components/ui/basics';
 import { Icon } from '@/components/ui/icon';
-import { FOOTER_COLUMNS, SCHOOL } from '@/lib/site';
+import { dict, type Lang } from '@/lib/i18n';
+import { footerColumns, SCHOOL } from '@/lib/site';
 import type { LinkItem } from '@/lib/types';
+import { LanguageLinks } from './language-switcher';
 
-/** Chân trang trên nền surface-inverse: logo, liên hệ, 3 cột link. */
-export function Footer({ extraLinks = [] }: { extraLinks?: LinkItem[] }) {
-  const columns = FOOTER_COLUMNS.map((c) =>
-    c.title === 'Kết nối' ? { ...c, links: [...c.links, ...extraLinks.filter((l) => l.url).map((l) => ({ label: l.name, href: l.url! }))] } : c,
+/** Chân trang trên nền surface-inverse: logo, liên hệ, 3 cột link, chọn ngôn ngữ. */
+export function Footer({ lang, extraLinks = [] }: { lang: Lang; extraLinks?: LinkItem[] }) {
+  const t = dict(lang);
+  const columns = footerColumns(lang).map((c, i) =>
+    i === 2 ? { ...c, links: [...c.links, ...extraLinks.filter((l) => l.url).map((l) => ({ label: l.name, href: l.url! }))] } : c,
   );
   return (
     <footer className="lqd-footer">
       <div className="lqd-container">
         <div className="lqd-footer-grid">
           <div>
-            <Logo inverse size={56} />
+            <Logo inverse size={56} lang={lang} />
             <div className="lqd-footer-contact">
               <div>
                 <Icon name="pin" />
-                <span>{SCHOOL.address}</span>
+                <span>{t.footer.address}</span>
               </div>
               <div>
                 <Icon name="phone" />
@@ -51,9 +54,9 @@ export function Footer({ extraLinks = [] }: { extraLinks?: LinkItem[] }) {
         </div>
         <div className="lqd-footer-bottom">
           <span>
-            © {new Date().getFullYear()} {SCHOOL.name}
+            © {new Date().getFullYear()} {t.common.siteName}
           </span>
-          <span>Tiếng Việt</span>
+          <LanguageLinks />
         </div>
       </div>
     </footer>

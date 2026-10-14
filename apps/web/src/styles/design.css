@@ -475,8 +475,7 @@ textarea.lqd-input { resize: vertical; }
 .lqd-checklist { display: flex; flex-direction: column; gap: var(--space-2); }
 
 @media (max-width: 860px) {
-  .lqd-grid-2, .lqd-grid-3, .lqd-grid-4, .lqd-split, .lqd-footer-grid, .lqd-with-aside, .lqd-quick, .lqd-searchpanel, .lqd-slider-inner, .lqd-promo, .lqd-admin-split, .lqd-editor, .lqd-stat-grid { grid-template-columns: 1fr; }
-  .lqd-nav-links { display: none; }
+  .lqd-grid-2, .lqd-grid-3, .lqd-grid-4, .lqd-split, .lqd-footer-grid, .lqd-with-aside, .lqd-quick, .lqd-searchpanel, .lqd-slider-inner, .lqd-promo, .lqd-admin-split, .lqd-editor, .lqd-stat-grid { grid-template-columns: minmax(0, 1fr); }
   .lqd-slide-text h1 { font-size: 36px; line-height: 44px; }
   .lqd-news-featured { flex-direction: column; }
   .lqd-container { padding-left: var(--space-4); padding-right: var(--space-4); }

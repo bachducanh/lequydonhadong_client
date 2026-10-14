@@ -11,7 +11,7 @@
 .lqd-prose li + li { margin-top: var(--space-1); }
 .lqd-prose img { border-radius: var(--radius-lg); margin-left: auto; margin-right: auto; height: auto; }
 .lqd-prose blockquote { border-left: 3px solid var(--accent); padding: var(--space-2) var(--space-4); background: var(--surface-sunken); border-radius: 0 var(--radius-md) var(--radius-md) 0; }
-.lqd-prose table { width: 100%; border-collapse: collapse; font-size: 15px; }
+.lqd-prose table { width: 100%; border-collapse: collapse; font-size: 15px; display: block; overflow-x: auto; }
 .lqd-prose th, .lqd-prose td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; }
 .lqd-prose iframe { width: 100%; aspect-ratio: 16 / 9; height: auto; border-radius: var(--radius-lg); }
 .lqd-prose figcaption { font-size: 14px; color: var(--ink-muted); text-align: center; }
@@ -35,30 +35,124 @@
 .lqd-alert-success { background: var(--success-soft); color: var(--success); }
 .lqd-alert-error { background: var(--danger-soft); color: var(--danger); }
 
-/* Menu di động */
+/* Menu thu gọn (☰): dưới 1100px 5 mục menu không còn đủ chỗ trên một hàng */
 .lqd-nav-toggle { display: none; }
 .lqd-mobile-menu { display: none; }
-@media (max-width: 860px) {
+@media (max-width: 1100px) {
+  .lqd-nav-links { display: none; }
   .lqd-nav-toggle { display: inline-grid; }
-  .lqd-nav .lqd-container { gap: var(--space-3); }
   .lqd-nav-actions { margin-left: auto; }
-  .lqd-nav .lqd-logo-text b { font-size: 15px; }
-  .lqd-nav-cta { display: none; }
-  .lqd-mobile-menu.is-open { display: flex; flex-direction: column; padding: var(--space-2) var(--space-4) var(--space-4); background: var(--surface-raised); border-bottom: 1px solid var(--border); box-shadow: var(--shadow-card); position: relative; z-index: 2; }
-  .lqd-mobile-menu a { padding: 12px 0; color: var(--ink); text-decoration: none; font-weight: 500; border-bottom: 1px solid var(--border); }
-  .lqd-mobile-menu a[aria-current="page"] { color: var(--primary-text); font-weight: 700; }
-  .lqd-mobile-menu .lqd-btn { margin-top: var(--space-3); }
-  .lqd-pagehead h1 { font-size: 32px; line-height: 40px; }
-  .lqd-sechead { flex-direction: column; align-items: flex-start; }
-  .lqd-sechead h2 { font-size: 26px; line-height: 34px; }
-  .lqd-doc { flex-wrap: wrap; }
-  .lqd-doc-main { min-width: 60%; }
-  .lqd-searchpanel { padding: var(--space-6); }
-  .lqd-slider-inner { padding-bottom: 140px; }
-  .lqd-promo-text { padding: var(--space-8) var(--space-6); }
-  .lqd-aside { position: static; }
-  .lqd-article h1 { font-size: 30px !important; line-height: 38px !important; }
+  .lqd-mobile-menu.is-open { display: flex; flex-direction: column; padding: var(--space-2) var(--space-8) var(--space-4); background: var(--surface-raised); border-bottom: 1px solid var(--border); box-shadow: var(--shadow-card); position: relative; z-index: 2; }
+  .lqd-mobile-menu > a:not(.lqd-btn) { padding: 12px 0; color: var(--ink); text-decoration: none; font-weight: 500; border-bottom: 1px solid var(--border); }
+  .lqd-mobile-menu > a[aria-current="page"] { color: var(--primary-text); font-weight: 700; }
+  .lqd-mobile-menu .lqd-btn { margin-top: var(--space-4); }
 }
+
+/* Điện thoại và tablet dọc */
+@media (max-width: 860px) {
+  .lqd-section { padding: var(--space-12) 0; }
+  .lqd-nav .lqd-container { gap: var(--space-3); }
+  .lqd-nav .lqd-logo { gap: var(--space-2); min-width: 0; }
+  .lqd-nav .lqd-logo img { width: 40px !important; height: 40px !important; }
+  .lqd-nav .lqd-logo-text { min-width: 0; }
+  .lqd-nav .lqd-logo-text b { font-size: 15px; white-space: nowrap; }
+  .lqd-nav .lqd-logo-kicker { font-size: 10px; }
+  .lqd-nav-cta { display: none; }
+  .lqd-mobile-menu.is-open { padding-left: var(--space-4); padding-right: var(--space-4); }
+  .lqd-topbar .lqd-container { justify-content: space-between; }
+
+  /* Ô nhập >= 16px để iPhone không tự phóng to trang khi chạm vào */
+  .lqd-input, .lqd-search input, .lqd-admin-search input, .lqd-select-sm, textarea { font-size: 16px; }
+
+  .lqd-slider-inner { padding-top: var(--space-8); padding-bottom: 104px; gap: var(--space-8); min-height: 0; }
+  .lqd-slide-text h1 { font-size: 30px; line-height: 38px; }
+  .lqd-slide-lead { font-size: 16px; line-height: 26px; margin-bottom: var(--space-6); }
+  .lqd-slide-thumb { aspect-ratio: 16 / 9; border-radius: var(--radius-lg); }
+  .lqd-slider-controls { left: var(--space-4); bottom: 40px; }
+  .lqd-slide-text .lqd-btn-lg { height: 48px; padding: 0 var(--space-6); font-size: 15px; }
+
+  .lqd-searchpanel { margin-top: -40px; padding: var(--space-6) var(--space-4); gap: var(--space-4); }
+  .lqd-searchpanel h2 { font-size: 20px; line-height: 28px; }
+  .lqd-search { padding-left: var(--space-4); }
+
+  .lqd-pagehead .lqd-container { padding-top: var(--space-8); padding-bottom: var(--space-8); }
+  .lqd-pagehead h1 { font-size: 30px; line-height: 38px; }
+  .lqd-pagehead-lead { font-size: 16px; line-height: 26px; }
+  .lqd-sechead { flex-direction: column; align-items: flex-start; gap: var(--space-3); margin-bottom: var(--space-6); }
+  .lqd-sechead h2 { font-size: 26px; line-height: 34px; }
+
+  .lqd-doc { flex-wrap: wrap; padding: var(--space-4); gap: var(--space-3); }
+  .lqd-doc-main { flex: 1 1 calc(100% - 64px); }
+  .lqd-doc-actions { width: 100%; padding-left: 60px; justify-content: space-between; }
+  .lqd-ann { padding: var(--space-4); gap: var(--space-3); }
+
+  .lqd-news-featured .lqd-news-media { min-height: 0; aspect-ratio: 16 / 9; }
+  .lqd-news-featured .lqd-news-body { padding: var(--space-6); }
+  .lqd-news-featured h3 { font-size: 22px; line-height: 30px; }
+  .lqd-promo-text { padding: var(--space-8) var(--space-6); }
+  .lqd-promo h3 { font-size: 24px; line-height: 32px; }
+  .lqd-promo-media { min-height: 160px; }
+  .lqd-formcard { padding: var(--space-6) var(--space-4); }
+  .lqd-comment-form { padding: var(--space-4); }
+  .lqd-aside { position: static; }
+  .lqd-with-aside { gap: var(--space-8); }
+  .lqd-article-title { font-size: 28px; line-height: 36px; }
+  .lqd-footer .lqd-container { padding-top: var(--space-12); }
+  .lqd-footer-grid { gap: var(--space-6); }
+  .lqd-login { padding: var(--space-16) var(--space-4) var(--space-8); }
+  .lqd-login-card { padding: var(--space-8) var(--space-6) var(--space-6); }
+}
+
+/* Điện thoại nhỏ (≤ 480px): nút tìm kiếm chỉ còn biểu tượng */
+@media (max-width: 480px) {
+  .lqd-search button { padding: 0; width: 44px; display: grid; place-items: center; flex: none; }
+  .lqd-search-btn-text { display: none; }
+  .lqd-search button .lqd-search-btn-icon { display: block; color: var(--on-primary); }
+  .lqd-tabs button, .lqd-tabs a { padding: 6px 12px; }
+}
+
+/* Bố cục phụ trợ */
+.lqd-select-sm { max-width: 100%; text-overflow: ellipsis; }
+@media (max-width: 860px) {
+  .lqd-listbar > .lqd-select-sm { width: 100%; }
+}
+.lqd-search .lqd-search-btn-icon { display: none; }
+.lqd-doc-actions { display: flex; align-items: center; gap: var(--space-3); flex: none; }
+.lqd-pager-row { display: flex; justify-content: center; margin-top: 40px; }
+.lqd-grid-roomy { row-gap: 40px; }
+.lqd-searchpanel-flat { margin-top: var(--space-8); }
+.lqd-section-article { padding-top: 40px; }
+.lqd-article-tags { margin-top: 24px; display: flex; gap: 8px; flex-wrap: wrap; }
+.lqd-article-title { font-size: 40px; line-height: 48px; letter-spacing: -.02em; margin: 12px 0 0; font-weight: 800; overflow-wrap: anywhere; }
+@media (min-width: 861px) {
+  .lqd-with-aside.lqd-aside-wide { grid-template-columns: minmax(0, 1fr) minmax(0, 440px); }
+}
+
+/* Chọn ngôn ngữ kiểu edX */
+.lqd-topbar .lqd-container { align-items: center; gap: var(--space-4); }
+.lqd-lang { position: relative; }
+.lqd-lang-btn { display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 8px; border: 0; border-radius: var(--radius-sm); background: transparent; color: var(--ink); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+.lqd-lang-btn .lqd-icon { width: 15px; height: 15px; }
+.lqd-lang-btn .lqd-lang-chev { width: 13px; height: 13px; transition: transform .15s; }
+.lqd-lang-btn[aria-expanded="true"] .lqd-lang-chev { transform: rotate(180deg); }
+.lqd-lang-btn:hover { background: var(--accent-soft); }
+.lqd-lang-inverse .lqd-lang-btn { color: var(--on-inverse); }
+.lqd-lang-inverse .lqd-lang-btn:hover { background: rgba(255, 255, 255, .12); }
+.lqd-lang-menu { position: absolute; top: calc(100% + 6px); left: 0; z-index: 30; min-width: 168px; margin: 0; padding: 6px; list-style: none; background: var(--surface-raised); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow-search); }
+.lqd-lang-menu-end { left: auto; right: 0; }
+.lqd-lang-menu button { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); padding: 9px 12px; border: 0; border-radius: var(--radius-sm); background: transparent; color: var(--ink); font: inherit; font-size: 14px; font-weight: 500; text-align: left; cursor: pointer; }
+.lqd-lang-menu button:hover { background: var(--surface-sunken); }
+.lqd-lang-menu button[aria-selected="true"] { color: var(--primary-text); font-weight: 700; }
+.lqd-lang-menu .lqd-icon { width: 16px; height: 16px; color: var(--primary-text); }
+.lqd-lang-links { display: inline-flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.lqd-lang-links > .lqd-icon { width: 15px; height: 15px; margin-right: 2px; }
+.lqd-lang-links button { padding: 2px 0; border: 0; background: none; color: inherit; font: inherit; cursor: pointer; }
+.lqd-lang-links button:hover { text-decoration: underline; }
+.lqd-lang-links button[aria-current="true"] { font-weight: 700; color: var(--on-inverse); }
+.lqd-mobile-lang { margin-top: var(--space-4); color: var(--ink-muted); font-size: 14px; }
+.lqd-mobile-lang button[aria-current="true"] { color: var(--primary-text); }
+.lqd-login-page { position: relative; min-height: 100vh; display: grid; background: var(--surface-inverse); }
+.lqd-login-lang { position: absolute; top: var(--space-4); right: var(--space-4); z-index: 2; }
 
 /* Ảnh album + xem ảnh lớn */
 .lqd-photos { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: var(--space-4); }

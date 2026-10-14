@@ -4,50 +4,57 @@ import { AskForm } from '@/components/site/forms';
 import { QAList } from '@/components/site/qa-list';
 import { Empty, FilterTabs, Pagination } from '@/components/ui/basics';
 import { apiSafe, emptyPage, pageOf, pick } from '@/lib/api';
+import { label } from '@/lib/i18n';
+import { getI18n } from '@/lib/i18n-server';
 import { QA_TOPICS } from '@/lib/site';
 import type { Paged, Question } from '@/lib/types';
 import { hrefWith } from '@/lib/url';
 
-export const metadata: Metadata = { title: 'Hỏi đáp & Góp ý', description: 'Tra cứu câu hỏi thường gặp hoặc gửi câu hỏi, góp ý cho nhà trường.' };
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getI18n();
+  return { title: t.qa.title, description: t.qa.desc };
+}
 
 type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> };
 
 export default async function QAPage({ searchParams }: Props) {
   const sp = await searchParams;
+  const { lang, t } = await getI18n();
   const q = pick(sp, 'q');
   const topic = pick(sp, 'chu-de');
   const page = pageOf(sp);
   const data = await apiSafe<Paged<Question>>('/questions', { q, topic, page, limit: 8 }, emptyPage<Question>());
   const counts = data.meta.counts ?? {};
-  const tabs = [{ label: 'Tất cả', value: undefined as string | undefined }, ...QA_TOPICS.map((t) => ({ label: t, value: t }))];
+  const tabs = [{ label: t.common.all, value: undefined as string | undefined }, ...QA_TOPICS.map((v) => ({ label: label(lang, 'topic', v), value: v }))];
 
   return (
     <>
       <PageHeader
-        breadcrumb={[{ label: 'Trang chủ', href: '/' }, { label: 'Hỏi đáp' }]}
-        eyebrow="Hỏi đáp – Góp ý"
-        title="Hỏi đáp & Góp ý"
-        description="Tra cứu câu hỏi thường gặp hoặc gửi câu hỏi, góp ý cho nhà trường."
-        search={{ action: '/hoi-dap', placeholder: 'Tìm câu hỏi…', defaultValue: q, hidden: { 'chu-de': topic } }}
+        lang={lang}
+        breadcrumb={[{ label: t.common.home, href: '/' }, { label: t.nav.items['hoi-dap'] }]}
+        eyebrow={t.qa.eyebrow}
+        title={t.qa.title}
+        description={t.qa.desc}
+        search={{ action: '/hoi-dap', placeholder: t.qa.searchPlaceholder, defaultValue: q, hidden: { 'chu-de': topic } }}
       />
       <section className="lqd-section">
-        <div className="lqd-container lqd-with-aside" style={{ gridTemplateColumns: 'minmax(0,1fr) minmax(0,440px)' }}>
+        <div className="lqd-container lqd-with-aside lqd-aside-wide">
           <div>
             <div className="lqd-listbar">
               <FilterTabs
-                value={Math.max(0, tabs.findIndex((t) => t.value === topic))}
-                items={tabs.map((t) => ({ label: t.label, count: t.value ? counts[t.value] ?? 0 : counts.ALL ?? 0, href: hrefWith('/hoi-dap', { q, 'chu-de': t.value }) }))}
+                value={Math.max(0, tabs.findIndex((tab) => tab.value === topic))}
+                items={tabs.map((tab) => ({ label: tab.label, count: tab.value ? (counts[tab.value] ?? 0) : (counts.ALL ?? 0), href: hrefWith('/hoi-dap', { q, 'chu-de': tab.value }) }))}
               />
             </div>
             {data.data.length ? (
               <QAList key={`${topic}-${q}-${page}`} items={data.data} />
             ) : (
-              <Empty icon="help" title="Chưa có câu hỏi phù hợp">
-                Bạn có thể gửi câu hỏi cho nhà trường ở biểu mẫu bên cạnh.
+              <Empty icon="help" title={t.qa.empty}>
+                {t.qa.emptyHint}
               </Empty>
             )}
-            <div style={{ display: 'flex', justifyContent: 'center', marginTop: 32 }}>
-              <Pagination page={page} total={data.meta.totalPages} hrefFor={(p) => hrefWith('/hoi-dap', { q, 'chu-de': topic, trang: p })} />
+            <div className="lqd-pager-row">
+              <Pagination lang={lang} page={page} total={data.meta.totalPages} hrefFor={(p) => hrefWith('/hoi-dap', { q, 'chu-de': topic, trang: p })} />
             </div>
           </div>
           <div>

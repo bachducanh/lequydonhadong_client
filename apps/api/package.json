@@ -12,7 +12,8 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:deploy": "prisma migrate deploy",
     "prisma:seed": "tsx src/database/seed.ts",
-    "prisma:studio": "prisma studio"
+    "prisma:studio": "prisma studio",
+    "db:clear-content": "tsx src/database/clear-content.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.1.0",

@@ -4,32 +4,36 @@ import { PhotoGrid } from '@/components/site/interactive';
 import { Empty, TextLink } from '@/components/ui/basics';
 import { apiGet, apiOr404 } from '@/lib/api';
 import { formatDate } from '@/lib/format';
+import { getI18n } from '@/lib/i18n-server';
 import type { AlbumDetail } from '@/lib/types';
 
 type Props = { params: Promise<{ id: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
+  const { t } = await getI18n();
   const album = await apiGet<AlbumDetail>(`/albums/${encodeURIComponent(id)}`).catch(() => null);
-  return album ? { title: album.title, description: album.description ?? undefined } : { title: 'Không tìm thấy album' };
+  return album ? { title: album.title, description: album.description ?? undefined } : { title: t.notFound.title };
 }
 
 export default async function AlbumPage({ params }: Props) {
   const { id } = await params;
+  const { lang, t } = await getI18n();
   const album = await apiOr404<AlbumDetail>(`/albums/${encodeURIComponent(id)}`);
   return (
     <>
       <PageHeader
-        breadcrumb={[{ label: 'Trang chủ', href: '/' }, { label: 'Thư viện', href: '/thu-vien' }, { label: album.title }]}
-        eyebrow={`${album.photos.length} ảnh · ${formatDate(album.eventDate)}`}
+        lang={lang}
+        breadcrumb={[{ label: t.common.home, href: '/' }, { label: t.library.eyebrow, href: '/thu-vien' }, { label: album.title }]}
+        eyebrow={t.library.photoMeta(album.photos.length, formatDate(album.eventDate))}
         title={album.title}
         description={album.description ?? undefined}
       />
       <section className="lqd-section">
         <div className="lqd-container lqd-stack" style={{ gap: 32 }}>
-          {album.photos.length ? <PhotoGrid photos={album.photos} title={album.title} /> : <Empty icon="images" title="Album chưa có ảnh" />}
+          {album.photos.length ? <PhotoGrid photos={album.photos} title={album.title} /> : <Empty icon="images" title={t.library.albumEmpty} />}
           <div>
-            <TextLink href="/thu-vien">Xem tất cả album</TextLink>
+            <TextLink href="/thu-vien">{t.library.allAlbums}</TextLink>
           </div>
         </div>
       </section>
