@@ -10,7 +10,7 @@ import { isExternal } from '@/lib/format';
 import type { Slide } from '@/lib/types';
 
 /**
- * Banner trang chủ (quản lý ở "Ảnh giới thiệu"): mỗi slide là một ảnh tràn hết chiều ngang (khung 1920×800).
+ * Banner trang chủ (quản lý ở "Ảnh giới thiệu"): mỗi slide là một ảnh tràn hết chiều ngang (khung 1920×600).
  * Bấm ảnh mở liên kết của slide. Tự chuyển 6 giây, dừng khi rê chuột/focus, vuốt được trên điện thoại;
  * tắt hiệu ứng chuyển khi người dùng chọn giảm chuyển động. Chưa có ảnh nào: hiện dải chào mừng.
  */
